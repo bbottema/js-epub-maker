@@ -1,0 +1,41 @@
+{
+  "name": "epub-maker",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bbottema/epub-maker.git"
+  },
+  "authors": [
+    "Benny Bottema (http://blog.projectnibble.org/)"
+  ],
+  "main": "./dist/epub-maker.min.js",
+  "dependencies": {
+    "angular": "*"
+  },
+  "devDependencies": {
+  },
+  "keywords": [
+    "epub",
+    "generator",
+    "creator",
+    "$maker"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "spec",
+    "debug",
+    "tmp",
+    "src",
+    "reports"
+  ],
+  "homepage": "https://github.com/bbottema/epub-maker",
+  "description": "",
+  "moduleType": [
+    "globals"
+  ]
+}
