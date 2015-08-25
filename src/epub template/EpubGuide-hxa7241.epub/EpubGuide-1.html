@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+   <title>&lsquo;Epub Format Construction Guide&rsquo; - HXA7241 : part 1</title>
+
+   <link rel="stylesheet" type="text/css" href="EpubGuide.css" />
+</head>
+
+
+<body>
+
+<div class="edge" id="header"><a href="http://www.hxa.name/articles/"><img src="hxa7241-logo.svg" alt="HXA7241 logo"/></a></div>
+
+
+<div id="text">
+
+<div class="section" id="xhtmldocuments">
+<h2>1: XHTML Documents</h2>
+
+   <p>Make the main content with XHTML, CSS, and images.</p>
+
+   <p><i>Relevant <a href="EpubGuide-specs.html">specifications: OPS, XHTML, CSS</a>.</i></p>
+
+   <h3>XHTML</h3>
+
+   <p>Use XHTML 1.1, but without the following modules:</p>
+   <ul>
+      <li>Forms</li>
+      <li>Server-side Image Map</li>
+      <li>Intrinsic Events</li>
+      <li>Scripting</li>
+   </ul>
+
+   <p>(XHTML 1.1 difference from XHTML 1 strict:</p>
+   <ul>
+      <li><code>lang</code> attribute not allowed (use <code>xml:lang</code> instead)</li>
+      <li><code>name</code> attribute on <code>a</code> and <code>map</code> elements not allowed (use <code>id</code> instead)</li>
+      <li>ruby annotations are allowed)</li>
+   </ul>
+
+   <p>Include XML declaration and XHTML doctype, at the top:</p>
+   <div class="codeblock">
+      &lt;?xml version="1.0" encoding="UTF-8"?&gt;<br/>
+      &lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"&gt;
+   </div>
+
+   <p>and <code>xmlns</code> attribute in <code>html</code>:</p>
+   <div class="codeblock">
+      &lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+   </div>
+
+   <p>Any unicode character, in UTF-8 or UTF-16, is allowed. But readers may have limited rendering capabilities.</p>
+
+   <p><i>(ADE 1.0 doesn't support: &amp;shy; &amp;ensp; &amp;emsp; &amp;thinsp; &amp;zwnj; &amp;zwj; &amp;lrm; &amp;rlm; &amp;oline; &amp;lceil; &amp;rceil;  &amp;lfloor; &amp;rfloor;)</i></p>
+
+   <h3>CSS</h3>
+
+   <p>A subset of CSS 2.1 is supported. A brief summary is awkward to make. For details, see the <a href="http://www.idpf.org/2007/ops/OPS_2.0_final_spec.html#Section3.0">CSS part of the OPS specification</a>.</p>
+
+   <p>Be simple, and use CSS 1 without the following properties:</p>
+   <ul>
+      <li>background image related:
+         <ul>
+            <li><code>background-image</code></li>
+            <li><code>background-repeat</code></li>
+            <li><code>background-attachment</code></li>
+            <li><code>background-position</code></li>
+            <li><code>background</code></li>
+         </ul>
+      </li>
+      <li><code>word-spacing</code></li>
+      <li><code>letter-spacing</code></li>
+      <li><code>text-transform</code></li>
+      <li><code>list-style-image</code></li>
+   </ul>
+   <p>(There are also a few other minor details unsupported.) And don't use absolute positioning.</p>
+
+   <p>The CSS can be linked from the XHTML <code>head</code>, or put in <code>style</code> in <code>head</code>.</p>
+
+   <p><i>(ADE 1.0 doesn't support:</i></p>
+   <ul>
+      <li><i>pseudo-classes/elements</i></li>
+      <li><i><code>text-align: justify;</code></i></li>
+      <li><i><code>font-variant: small-caps;</code></i></li>
+      <li><i>OPS extras:</i>
+         <ul>
+            <li><i><code>display: oeb-page-head;</code></i></li>
+            <li><i><code>display: oeb-page-foot;</code></i></li>
+            <li><i><code>oeb-column-number: [integer];)</code></i></li>
+         </ul>
+      </li>
+   </ul>
+
+   <h3>Images</h3>
+
+   <p>The XHTML can have images of the following types:</p>
+   <ul>
+      <li><code>image/jpeg</code></li>
+      <li><code>image/png</code></li>
+      <li><code>image/gif</code></li>
+      <li><code>image/svg+xml</code></li>
+   </ul>
+
+   <h3>Fonts</h3>
+
+   <p>Use OpenType fonts. Reference them in the CSS with <code>@font-face</code>, eg.:</p>
+   <div class="codeblock">
+      @font-face { font-family: "<span class="highlight">Minion Pro</span>"; src: url(<span class="highlight">MinionPro.otf</span>); }<br/>
+      @font-face { font-family: "<span class="highlight">Minion Pro</span>"; <span class="highlight">font-style: italic;</span> src: url(<span class="highlight">MinionPro-It.otf</span>); }
+   </div>
+   <p>Other descriptors allowed are: <code>font-variant</code>, <code>font-weight</code>, <code>font-size</code>.</p>
+</div>
+
+</div><!--text-->
+
+
+</body>
+
+</html>

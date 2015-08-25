@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" version="1.1" baseProfile="tiny" width="240" height="30" viewBox="0 0 240 30">
+
+   <title>HXA7241 logo</title>
+
+   <!-- http://www.hxa.name/ -->
+
+   <a xlink:href="http://www.hxa.name/" target="_top">
+   
+   <g fill="#FFFFFF" stroke-width="0" color-rendering="optimizeQuality" shape-rendering="geometricPrecision">
+      <rect x="0" y="0" width="240" height="30" opacity="0.0" />
+
+      <g id="_H">
+         <polygon points="0,30  0,19  30,19  30,30  20,30  20,25  5,25  5,30" />
+         <polygon points="0,18  0,0  5,0  5,15  10,15  10,10  20,10  20,0  30,0 30,18" />
+      </g>
+
+      <g id="_X" transform="translate(35, 0)">
+         <polygon points="0,30  0,22  5,22  5,30" />
+         <polygon points="20,30  20,25  10,25  10,23  30,23  30,30" />
+         <polygon points="0,21  0,15  5,15  10,10  20,10  20,15  30,15  30,22  10,22  10,20  5,20  5,21" />
+         <polygon points="0,10  0,0  5,0  5,10" />
+         <polygon points="20,10  20,0  30,0  30,10" />
+      </g>
+
+      <g id="_A" transform="translate(70, 0)">
+         <polygon points="0,30  0,22  5,22  5,30" />
+         <polygon points="20,30  20,21  30,21  30,30" />
+         <polygon points="0,20  0,15  5,15  5,20" />
+         <polygon points="0,10  10,0  20,0  30,10  30,19  20,19  20,15  10,15  10,10" />
+      </g>
+
+      <g id="_7" transform="translate(105, 0)">
+         <polygon points="15,30  20,25  20,15  25,15  25,10  0,10  0,7  30,7  30,30" />
+         <polygon points="0,6  0,0  25,0  30,5  30,6" />
+      </g>
+
+      <g id="_2" transform="translate(140, 0)">
+         <polygon points="0,30  0,15  10,15  10,20  20,20  20,25  30,25  30,30" />
+         <polygon points="20,15  20,11  30,11  30,15" />
+         <polygon points="0,5  0,0  20,0  30,5  30,9  20,9  20,5" />
+      </g>
+
+      <g id="_4" transform="translate(175, 0)">
+         <polygon points="25,30  25,25  0,25  0,10  10,10  10,15  15,15  15,10  25,10  25,8  30,8  30,30" />
+         <polygon points="0,8  0,0  10,0  10,8" />
+         <polygon points="25,6  25,0  30,0  30,6" />
+      </g>
+
+      <g id="_1" transform="translate(210, 0)">
+         <polygon points="0,30  0,25  10,25  10,7  20,7  20,20  30,20  30,30" />
+         <polygon points="0,10  0,6  4,6" />
+         <polygon points="0,5  0,0  20,0  20,6  10,6  10,5" />
+      </g>
+   </g>
+
+   </a>
+
+</svg>
