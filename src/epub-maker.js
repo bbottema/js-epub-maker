@@ -6,6 +6,11 @@
         var self = this;
 
         this.newMaker = function() {
+            return new EpubMaker();
+        };
+        
+        this.withToC = function() {
+            return self;
         };
     };
 
