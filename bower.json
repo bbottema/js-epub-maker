@@ -10,7 +10,9 @@
   ],
   "main": "./dist/epub-maker.min.js",
   "dependencies": {
-    "angular": "*"
+    "jquery": "~2.1.4",
+    "jszip": "~2.5.0",
+    "FileSaver.js": "~0.0.2"
   },
   "devDependencies": {
   },

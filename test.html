@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>js-epub-maker</title>
+		
+	</head>
+	
+	<body>
+		<!-- bower:js -->
+		<script src="bower_components/jquery/dist/jquery.js"></script>
+		<script src="bower_components/jszip/dist/jszip.js"></script>
+		<script src="bower_components/FileSaver.js/FileSaver.js"></script>
+		<!-- endbower -->
+		
+		<script src="dist/js-epub-maker.js"></script>
+		
+		<button id="testBtn">test</button>
+		
+		<script>
+        $('#testBtn').click(function() {
+            window.epubMaker.newMaker()
+                .withTemplate('idpf-wasteland')
+                .withTitle('Use Of Wasteland Template')
+                .makeEpub();
+        });
+		</script>
+	</body>
+</html>

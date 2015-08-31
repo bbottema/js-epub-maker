@@ -1,3 +1,4 @@
+var fs = require('fs');
 var del = require('del');
 var lazypipe = require('lazypipe');
 var browserify = require('browserify');
@@ -21,14 +22,14 @@ gulp.task('clean', function() {
 });
 
 gulp.task('browserify', function() {
-    return browserify({entries: ['./src/epub-maker.js']}).bundle()
-        .pipe(source('epub-maker-browserified.js'))
+    return browserify({entries: ['./src/js-epub-maker.js']}).bundle()
+        .pipe(source('js-epub-maker-browserified.js'))
         .pipe(buffer())
         .pipe(gulp.dest('./debug/'));
 });
 
 gulp.task('analyse', function() {
-    gulp.src(['./src/epub-maker.js'])
+    gulp.src(['./src/js-epub-maker.js'])
         .pipe($.jshint())
         .pipe($.jshint.reporter('jshint-stylish'))
         .pipe($.jshint.reporter('fail'));
@@ -36,21 +37,29 @@ gulp.task('analyse', function() {
 
 gulp.task('build', ['clean', 'analyse', 'browserify'], function() {
     return gulp.src(['debug/**/*.js'])
-        .pipe($.concat("epub-maker.js"))
+        .pipe($.concat("js-epub-maker.js"))
         .pipe($.size('test'))
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('dist', ['build'], function() {
+gulp.task('dist', ['build', 'copy'], function() {
     return gulp.src(['debug/**/*.js'])
         .pipe($.uglify())
-        .pipe($.concat("epub-maker.min.js"))
+        .pipe($.concat("js-epub-maker.min.js"))
         .pipe($.size())
         .pipe(gulp.dest('dist'));
 });
 
+gulp.task('copy', function() {
+    fs.stat('file.txt', function(err, stat) {
+        if(err != null) {
+            gulp.src(['src/epub_templates/**/*']).pipe(gulp.dest('dist/epub_templates'));
+        }
+    });
+});
+
 var testAndGather = lazypipe()
-    .pipe($.coverage.instrument, { pattern: ['dist/epub-maker.js'], debugDirectory: 'debug' })
+    .pipe($.coverage.instrument, { pattern: ['dist/js-epub-maker.js'], debugDirectory: 'debug' })
     .pipe($.jasmine, { includeStackTrace: true })
     .pipe($.coverage.gather);
 
