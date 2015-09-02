@@ -25,7 +25,6 @@
                 deferred.resolve(zip);
             });
             
-			zip.file("Hello.txt", "Hello World\n");
             return deferred.promise();
         };
         
