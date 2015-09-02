@@ -1,6 +1,8 @@
-/* global require, module, exports, saveAs */
+/* global require, module, console, exports, saveAs */
 (function() {
     'use strict';
+    
+    var log = (console && console.debug) ? console.debug : function() {};
     
     var templateManagers = {
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
@@ -26,8 +28,10 @@
         
         this.makeEpub = function() {
             templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
+    			log.call(console, 'generating epub for: ' + epubConfig.title);
     			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
-    			var filename = epubConfig.title.toLowerCase().replace('\s', '-') + '.epub';
+    			var filename = epubConfig.title.toLowerCase().replace(/\s/g, '-') + '.epub';
+    			log.call(console, 'saving "' + filename + '"...');
     			saveAs(content, filename);
             });
         };
