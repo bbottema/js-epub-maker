@@ -50,13 +50,13 @@
     }
 }());
 },{"../src/js/template-builders/idpf-wasteland-builder.js":2}],2:[function(require,module,exports){
-/* global module, exports, JSZip, JSZipUtils */
+/* global module, exports, $, JSZip, JSZipUtils */
 (function() {
     'use strict';
     
     var baseUrl = 'dist/epub_templates/from_idpf_epub3/wasteland';
     
-    var builder = new function() {
+    var Builder = function() {
         
         
         this.make = function(epubConfig) {
@@ -144,17 +144,17 @@
 
     // manage dependency exports
     if (typeof module !== 'undefined') {
-        module.exports.builder = builder;
+        module.exports.builder = new Builder();
     }
     else if (typeof exports !== 'undefined') {
-        exports.builder = builder;
+        exports.builder = new Builder();
     }
     else if (typeof window === 'undefined') {
         throw new Error('unable to expose module: no module, exports object and no global window detected');
     }
 
     if (typeof window !== 'undefined') {
-        window.epubMaker = builder;
+        window.epubMaker = new Builder();
     }
 }());
 },{}]},{},[1]);
