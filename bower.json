@@ -12,6 +12,7 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "jszip": "~2.5.0",
+    "jszip-utils": "~0.0.2",
     "FileSaver.js": "~0.0.2"
   },
   "devDependencies": {

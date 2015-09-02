@@ -26,7 +26,7 @@
         
         this.makeEpub = function() {
             templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
-    			var content = epubZip.generate({type:"blob"});
+    			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
     			var filename = epubConfig.title.toLowerCase().replace('\s', '-') + '.epub';
     			saveAs(content, filename);
             });
