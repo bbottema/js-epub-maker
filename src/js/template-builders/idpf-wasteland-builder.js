@@ -1,4 +1,4 @@
-/* global module, exports, JSZip, JSZipUtils */
+/* global module, exports, $, JSZip */
 (function() {
     'use strict';
     
@@ -48,16 +48,9 @@
         }
         
         function addCover(zip) {
-            var p = $.Deferred();
-            JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
-                if (!err) {
-                    zip.folder('EPUB').file('wasteland-cover.jpg', data, { binary: true });
-                    p.resolve('');
-                } else {
-                    p.reject(err);
-                }
+            $.ajax({ url : baseUrl + '/EPUB/wasteland-cover.jpg', }).always(function(b64Data){
+                zip.folder('EPUB').file('wasteland-cover.jpg', b64Data, { base64: true });
             });
-            return p.promise();
         }
         
         function addEpub2Nav(zip) {
