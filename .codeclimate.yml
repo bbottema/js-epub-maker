@@ -4,4 +4,5 @@ languages:
   PHP: false
   Python: false
 exclude_paths:
-- "dist/epub-maker.js"
+- "dist/js-epub-maker.js"
+- "dist/js-epub-maker.min.js"
