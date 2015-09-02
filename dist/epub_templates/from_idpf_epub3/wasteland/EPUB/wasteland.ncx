@@ -13,37 +13,37 @@
             <navLabel>
                 <text>I. THE BURIAL OF THE DEAD</text>
             </navLabel>
-            <content src="wasteland-content.xhtml#ch1"/>
+            <content src="{{slug}}-content.xhtml#ch1"/>
         </navPoint>
         <navPoint id="ch2">
             <navLabel>
                 <text>II. A GAME OF CHESS</text>
             </navLabel>
-            <content src="wasteland-content.xhtml#ch2"/>
+            <content src="{{slug}}-content.xhtml#ch2"/>
         </navPoint>
         <navPoint id="ch3">
             <navLabel>
                 <text>III. THE FIRE SERMON</text>
             </navLabel>
-            <content src="wasteland-content.xhtml#ch3"/>
+            <content src="{{slug}}-content.xhtml#ch3"/>
         </navPoint>
         <navPoint id="ch4">
             <navLabel>
                 <text>IV. DEATH BY WATER</text>
             </navLabel>
-            <content src="wasteland-content.xhtml#ch4"/>
+            <content src="{{slug}}-content.xhtml#ch4"/>
         </navPoint>
         <navPoint id="ch5">
             <navLabel>
                 <text>V. WHAT THE THUNDER SAID</text>
             </navLabel>
-            <content src="wasteland-content.xhtml#ch5"/>
+            <content src="{{slug}}-content.xhtml#ch5"/>
         </navPoint>
         <navPoint id="rearnotes">
             <navLabel>
                 <text>NOTES ON "THE WASTE LAND"</text>
             </navLabel>
-            <content src="wasteland-content.xhtml#rearnotes"/>
+            <content src="{{slug}}-content.xhtml#rearnotes"/>
         </navPoint>
     </navMap>
 </ncx>

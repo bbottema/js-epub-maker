@@ -10,8 +10,9 @@
 		<script src="bower_components/jquery/dist/jquery.js"></script>
 		<script src="bower_components/jszip/dist/jszip.js"></script>
 		<script src="bower_components/jszip-utils/dist/jszip-utils.js"></script>
-		<script src="bower_components/FileSaver.js/FileSaver.js"></script>
-		<script src="bower_components/underscore.string/dist/underscore.string.js"></script>
+		<script src="bower_components/FileSaver.js/FileSaver.min.js"></script>
+		<script src="bower_components/underscore.string/dist/underscore.string.min.js"></script>
+		<script src="bower_components/handlebars/handlebars.min.js"></script>
 		<!-- endbower -->
 		
 		<script src="dist/js-epub-maker.js"></script>
@@ -22,7 +23,7 @@
         $('#testBtn').click(function() {
             window.epubMaker.newMaker()
                 .withTemplate('idpf-wasteland')
-                .withTitle('Use Of Wasteland Template')
+                .withTitle('Example Using Of Wasteland Template')
                 .makeEpub();
         });
 		</script>
