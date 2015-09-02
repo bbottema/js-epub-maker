@@ -23,6 +23,6 @@ Currently the only template supported is [idpf's wasteland epub sample](http://i
 [codeclimate-url]: https://codeclimate.com/github/bbottema/js-epub-maker
 [codeclimate-gpa-image]: https://codeclimate.com/github/bbottema/js-epub-maker/badges/gpa.svg
 
-[codacy-url]: https://www.codacy.com/app/b-bottema/console-logger/dashboard
-[codacy-image]: https://www.codacy.com/project/badge/fc9f04daa6cd4005bbe02683c3d0b558
-[codacy-shields-image]: https://img.shields.io/codacy/fc9f04daa6cd4005bbe02683c3d0b558.svg?style=flat
+[codacy-url]: https://www.codacy.com/app/b-bottema/js-epub-maker/dashboard
+[codacy-image]: https://www.codacy.com/project/badge/41d637e3c7ae405a942800cae60ee73f
+[codacy-shields-image]: https://img.shields.io/codacy/41d637e3c7ae405a942800cae60ee73f.svg?style=flat
