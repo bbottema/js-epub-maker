@@ -16,6 +16,7 @@
     "FileSaver.js": "~0.0.2"
   },
   "devDependencies": {
+    "underscore.string": "~3.2.1"
   },
   "keywords": [
     "epub",

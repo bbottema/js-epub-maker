@@ -3,7 +3,8 @@
 (function() {
     'use strict';
     
-    var log = (console && console.debug) ? console.debug : function() {};
+    var log = (typeof(console) !== 'undefined' && console.debug) ? console.debug : function() {};
+    var slugify = require('./js/slugify.js');
     
     var templateManagers = {
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
@@ -19,6 +20,7 @@
         
         this.withTitle = function(title) {
             epubConfig.title = title;
+            epubConfig.slug = slugify(title);
             return self;
         };
         
@@ -31,7 +33,7 @@
             templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
     			log.call(console, 'generating epub for: ' + epubConfig.title);
     			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
-    			var filename = epubConfig.title.toLowerCase().replace(/\s/g, '-') + '.epub';
+    			var filename = epubConfig.slug + '.epub';
     			log.call(console, 'saving "' + filename + '"...');
     			saveAs(content, filename);
             });
@@ -53,7 +55,21 @@
         window.epubMaker = new EpubMaker();
     }
 }());
-},{"../src/js/template-builders/idpf-wasteland-builder.js":2}],2:[function(require,module,exports){
+},{"../src/js/template-builders/idpf-wasteland-builder.js":3,"./js/slugify.js":2}],2:[function(require,module,exports){
+/* global s, console */
+(function() {
+    module.exports = (typeof(s) !== 'undefined' && s.slugify) ? s.slugify : simpleSlugify;
+    
+    if (module.exports === simpleSlugify) {
+        var log = (typeof(console) !== 'undefined' && console.debug) ? console.debug : function() {};
+        log.call(console, 'underscore.string not found, falling back on (very) simple slugify..');
+    }
+    
+    function simpleSlugify(str) {
+        return str.toLowerCase().replace(/\s/g, '-');
+    }
+}());
+},{}],3:[function(require,module,exports){
 /* global module, exports, $, JSZip, JSZipUtils */
 (function() {
     'use strict';
