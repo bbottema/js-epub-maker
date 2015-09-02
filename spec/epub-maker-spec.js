@@ -1,4 +1,4 @@
-/* global describe, beforeEach, expect, it*/
+/* global describe, expect, it*/
 
 describe('angular-logger', function() {
     
