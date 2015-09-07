@@ -2,7 +2,8 @@
 (function() {
     'use strict';
     
-    var log = (typeof(console) !== 'undefined' && console.debug) ? console.debug : function() {};
+    var log = (typeof(console) !== 'undefined' && console.debug) ? 
+        function () { console.debug.apply(console, arguments); } : function() {};
     var slugify = require('./js/slugify.js');
     
     var templateManagers = {
@@ -77,7 +78,7 @@
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
-    			log.call(console, 'generating epub for: ' + epubConfig.title);
+    			log('generating epub for: ' + epubConfig.title);
     			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
     			return content;
             });
@@ -86,7 +87,7 @@
         this.downloadEpub = function() {
             self.makeEpub().then(function(epubZipContent) {
     			var filename = epubConfig.slug + '.epub';
-    			log.call(console, 'saving "' + filename + '"...');
+    			log('saving "' + filename + '"...');
     			saveAs(epubZipContent, filename);
             });
         };
