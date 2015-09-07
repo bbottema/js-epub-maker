@@ -10,12 +10,13 @@
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
     };
     
-    var EpubMaker = function() {
+    var EpubMaker = function () {
         var self = this;
         var epubConfig = {};
         
-        this.newMaker = function() {
-            return new EpubMaker();
+        this.withTemplate = function(templateName) {
+            epubConfig.templateName = templateName;
+            return self;
         };
         
         this.withTitle = function(title) {
@@ -24,19 +25,94 @@
             return self;
         };
         
-        this.withTemplate = function(templateName) {
-            epubConfig.templateName = templateName;
+        this.withLanguage = function(lang) {
+            epubConfig.lang = lang;
+            return self;
+        };
+        
+        this.withAuthor = function(fullName) {
+            epubConfig.author = fullName;
+            return self;
+        };
+        
+        this.withModificationDate = function(modificationDate) {
+            epubConfig.modificationDate = modificationDate.toISOString();
+            return self;
+        };
+        
+        this.withCover = function() {
+            epubConfig.cover = true;
+            return self;
+        };
+        
+        this.withRights = function(rightsConfig) {
+            epubConfig.rights = rightsConfig;
+            return self;
+        };
+        
+        this.withCoverRights = function(rightsConfig) {
+            epubConfig.coverRights = rightsConfig;
+            return self;
+        };
+        
+        this.withAttributionUrl = function(attributionUrl) {
+            this.attributionUrl = attributionUrl;
+            return self;
+        };
+        
+        this.withFrontmatter = function(frontmatter) {
+            this.frontmatter = frontmatter;
+            return self;
+        };
+        
+        this.withBodymatter = function(bodymatter) {
+            this.bodymatter = bodymatter;
+            return self;
+        };
+        
+        this.withBackmatter = function(backmatter) {
+            this.backmatter = backmatter;
             return self;
         };
         
         this.makeEpub = function() {
-            templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
+            epubConfig.publicationDate = new Date().toISOString();
+            return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
     			log.call(console, 'generating epub for: ' + epubConfig.title);
     			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
+    			return content;
+            });
+        };
+        
+        this.downloadEpub = function() {
+            self.makeEpub().then(function(epubZipContent) {
     			var filename = epubConfig.slug + '.epub';
     			log.call(console, 'saving "' + filename + '"...');
-    			saveAs(content, filename);
+    			saveAs(epubZipContent, filename);
             });
+        };
+    };
+    
+    EpubMaker.Matter = function() {
+        var self = this;
+        this.sections = [];
+        
+        this.withSection = function(section) {
+            self.sections.push(section);
+            return self;
+        };
+    };
+    
+    EpubMaker.Section = function(id, content, includeInToc) {
+        var self = this;
+        this.id = id;
+        this.content = content;
+        this.includeInToc = includeInToc;
+        this.subSections = [];
+        
+        this.withSubSection = function(subsection) {
+            self.subSections.push(subsection);
+            return self;
         };
     };
 
@@ -52,7 +128,7 @@
     }
 
     if (typeof window !== 'undefined') {
-        window.epubMaker = new EpubMaker();
+        window.EpubMaker = EpubMaker;
     }
 }());
 },{"../src/js/template-builders/idpf-wasteland-builder.js":3,"./js/slugify.js":2}],2:[function(require,module,exports){
@@ -97,7 +173,6 @@
                 deferred.resolve(zip);
             });
             
-			zip.file("Hello.txt", "Hello World\n");
             return deferred.promise();
         };
         
@@ -121,14 +196,19 @@
         
         function addCover(zip, epubConfig) {
             var p = $.Deferred();
-            JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
-                if (!err) {
-                    zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
-                    p.resolve('');
-                } else {
-                    p.reject(err);
-                }
-            });
+            
+            if (epubConfig.cover) {
+                JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
+                    if (!err) {
+                        zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
+                        p.resolve('');
+                    } else {
+                        p.reject(err);
+                    }
+                });
+            } else {
+                p.resolve('');
+            }
             return p.promise();
         }
         
@@ -147,10 +227,10 @@
         function addStylesheets(zip, epubConfig) {
             return $.when(
                 $.get(baseUrl + '/EPUB/wasteland.css', function(file) {
-                   zip.folder('EPUB').file(epubConfig.slug + '.css', file);
+                   zip.folder('EPUB').file(epubConfig.slug + '.css', Handlebars.compile(file)(epubConfig));
                 }, 'text'),
                 $.get(baseUrl + '/EPUB/wasteland-night.css', function(file) {
-                   zip.folder('EPUB').file(epubConfig.slug + '-night.css', file);
+                   zip.folder('EPUB').file(epubConfig.slug + '-night.css', Handlebars.compile(file)(epubConfig));
                 }, 'text')
             );
         }

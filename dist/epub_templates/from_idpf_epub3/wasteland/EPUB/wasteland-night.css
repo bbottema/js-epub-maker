@@ -1,5 +1,5 @@
 @charset "UTF-8";
-@import "wasteland.css";
+@import "{{slug}}.css";
 
 body {
     color: rgb(255,250,205);

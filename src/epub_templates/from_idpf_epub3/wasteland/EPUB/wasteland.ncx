@@ -5,7 +5,7 @@
         <meta name="dtb:uid" content="code.google.com.epub-samples.wasteland-basic"/>
     </head>
     <docTitle>
-        <text>The Waste Land</text>
+        <text>{{title}}</text>
     </docTitle>
     <navMap>
         <!-- 2.01 NCX: playOrder is optional -->

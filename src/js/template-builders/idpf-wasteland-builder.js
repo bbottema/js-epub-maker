@@ -48,14 +48,19 @@
         
         function addCover(zip, epubConfig) {
             var p = $.Deferred();
-            JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
-                if (!err) {
-                    zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
-                    p.resolve('');
-                } else {
-                    p.reject(err);
-                }
-            });
+            
+            if (epubConfig.cover) {
+                JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
+                    if (!err) {
+                        zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
+                        p.resolve('');
+                    } else {
+                        p.reject(err);
+                    }
+                });
+            } else {
+                p.resolve('');
+            }
             return p.promise();
         }
         
@@ -74,10 +79,10 @@
         function addStylesheets(zip, epubConfig) {
             return $.when(
                 $.get(baseUrl + '/EPUB/wasteland.css', function(file) {
-                   zip.folder('EPUB').file(epubConfig.slug + '.css', file);
+                   zip.folder('EPUB').file(epubConfig.slug + '.css', Handlebars.compile(file)(epubConfig));
                 }, 'text'),
                 $.get(baseUrl + '/EPUB/wasteland-night.css', function(file) {
-                   zip.folder('EPUB').file(epubConfig.slug + '-night.css', file);
+                   zip.folder('EPUB').file(epubConfig.slug + '-night.css', Handlebars.compile(file)(epubConfig));
                 }, 'text')
             );
         }

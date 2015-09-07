@@ -16,16 +16,8 @@
 		<!-- endbower -->
 		
 		<script src="dist/js-epub-maker.js"></script>
+		<script src="src/test/test-script.js"></script>
 		
-		<button id="testBtn">test</button>
-		
-		<script>
-        $('#testBtn').click(function() {
-            window.epubMaker.newMaker()
-                .withTemplate('idpf-wasteland')
-                .withTitle('Example Using Of Wasteland Template')
-                .makeEpub();
-        });
-		</script>
+		<button id="testBtn" onclick="window.runTest()">test</button>
 	</body>
 </html>
