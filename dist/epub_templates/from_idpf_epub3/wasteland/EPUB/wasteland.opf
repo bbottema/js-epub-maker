@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">
     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
-        <dc:identifier id="uid">code.google.com.epub-samples.wasteland-basic</dc:identifier>
+        <dc:identifier id="uid">{{uuid}}</dc:identifier>
         <dc:title>{{title}}</dc:title>
         <dc:creator>{{author}}</dc:creator>
         <dc:language>{{lang}}</dc:language>
@@ -15,12 +15,12 @@
         {{/if}}
         {{#if cover}}{{#if coverRights}}
             <!-- rights expression for the cover image -->       
-            {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="http://creativecommons.org/licenses/by-sa/3.0/" />{{/if}}
-            {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="http://en.wikipedia.org/wiki/Simon_Fieldhouse" />{{/if}}
+            {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}
+            {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}
             <!-- cover meta element included for 2.0 reading system compatibility: -->
             <meta name="cover" content="cover"/>
         {{/if}}{{/if}}
-    </metadata> 
+    </metadata>
     <manifest>
         <item id="t1" href="{{slug}}-content.xhtml" media-type="application/xhtml+xml" />
         <item id="nav" href="{{slug}}-nav.xhtml" properties="nav" media-type="application/xhtml+xml" />

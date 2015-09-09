@@ -13,7 +13,12 @@
     
     var EpubMaker = function () {
         var self = this;
-        var epubConfig = {};
+        var epubConfig = { toc: [], landmarks: [], sections: [] };
+        
+        this.withUuid = function(uuid) {
+            epubConfig.uuid = uuid;
+            return self;
+        };
         
         this.withTemplate = function(templateName) {
             epubConfig.templateName = templateName;
@@ -57,22 +62,14 @@
         };
         
         this.withAttributionUrl = function(attributionUrl) {
-            this.attributionUrl = attributionUrl;
+            epubConfig.attributionUrl = attributionUrl;
             return self;
         };
         
-        this.withFrontmatter = function(frontmatter) {
-            this.frontmatter = frontmatter;
-            return self;
-        };
-        
-        this.withBodymatter = function(bodymatter) {
-            this.bodymatter = bodymatter;
-            return self;
-        };
-        
-        this.withBackmatter = function(backmatter) {
-            this.backmatter = backmatter;
+        this.withSection = function(section) {
+            epubConfig.sections.push(section);
+            Array.prototype.push.apply(epubConfig.toc, section.collectToc());
+            Array.prototype.push.apply(epubConfig.landmarks, section.collectLandmarks());
             return self;
         };
         
@@ -94,26 +91,39 @@
         };
     };
     
-    EpubMaker.Matter = function() {
+    /**
+     * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
+     * @id Optional, but required if section should be included in toc and / or landmarks
+     * @content Optional. Should not be empty if there will be no subsections added to this ection
+     */
+    EpubMaker.Section = function(epubType, id, content, includeInToc, includeInLandmarks) {
         var self = this;
-        this.sections = [];
-        
-        this.withSection = function(section) {
-            self.sections.push(section);
-            return self;
-        };
-    };
-    
-    EpubMaker.Section = function(id, content, includeInToc) {
-        var self = this;
+        this.epubType = epubType;
         this.id = id;
         this.content = content;
         this.includeInToc = includeInToc;
+        this.includeInLandmarks = includeInLandmarks;
         this.subSections = [];
         
         this.withSubSection = function(subsection) {
             self.subSections.push(subsection);
             return self;
+        };
+        
+        this.collectToc = function() {
+            var toc = self.includeInToc ? [self] : [];
+            for (var i = 0; i < self.subSections.length; i++) {
+                Array.prototype.push.apply(toc, self.subSections[i].collectToc());
+            }
+            return toc;
+        };
+        
+        this.collectLandmarks = function() {
+            var toc = self.includeInLandmarks ? [self] : [];
+            for (var i = 0; i < self.subSections.length; i++) {
+                Array.prototype.push.apply(toc, self.subSections[i].collectLandmarks());
+            }
+            return toc;
         };
     };
 
