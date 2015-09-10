@@ -20,7 +20,7 @@ window.runTest = function() {
 function createTestEpub(header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
     // FIXME add way to include custom jpg for cover
     new EpubMaker()
-        .withUuid('github.com/bbottema/js-epub-maker::example-using-idpf-wasteland')
+        .withUuid('github.com/bbottema/js-epub-maker::it-came-from::example-using-idpf-wasteland')
         .withTemplate('idpf-wasteland')
         .withAuthor('T. Est')
         .withLanguage('en-GB')
@@ -35,7 +35,7 @@ function createTestEpub(header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
         	license: 'http://creativecommons.org/licenses/by-sa/3.0/',
         	attributionUrl: 'http://en.wikipedia.org/wiki/Simon_Fieldhouse'
         })
-        .withTitle('Example Using Wasteland Template')
+        .withTitle('It Came From... [Example Using Waste Land Template]')
         .withSection(new EpubMaker.Section('frontmatter', 'frontmatter', { title: 'Title page' }, false, true)
             .withSubSection(new EpubMaker.Section('titlepage', 'manuscript-header', header, false, false))
         )
