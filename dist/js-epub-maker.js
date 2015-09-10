@@ -46,17 +46,13 @@
             return self;
         };
         
-        this.withCover = function() {
-            epubConfig.cover = true;
-            return self;
-        };
-        
         this.withRights = function(rightsConfig) {
             epubConfig.rights = rightsConfig;
             return self;
         };
         
-        this.withCoverRights = function(rightsConfig) {
+        this.withCover = function(coverUrl, rightsConfig) {
+            epubConfig.coverUrl = coverUrl;
             epubConfig.coverRights = rightsConfig;
             return self;
         };
@@ -208,8 +204,8 @@
         function addCover(zip, epubConfig) {
             var p = $.Deferred();
             
-            if (epubConfig.cover) {
-                JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
+            if (epubConfig.coverUrl) {
+                JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
                     if (!err) {
                         zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
                         p.resolve('');

@@ -45,17 +45,13 @@
             return self;
         };
         
-        this.withCover = function() {
-            epubConfig.cover = true;
-            return self;
-        };
-        
         this.withRights = function(rightsConfig) {
             epubConfig.rights = rightsConfig;
             return self;
         };
         
-        this.withCoverRights = function(rightsConfig) {
+        this.withCover = function(coverUrl, rightsConfig) {
+            epubConfig.coverUrl = coverUrl;
             epubConfig.coverRights = rightsConfig;
             return self;
         };

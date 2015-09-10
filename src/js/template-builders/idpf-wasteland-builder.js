@@ -49,8 +49,8 @@
         function addCover(zip, epubConfig) {
             var p = $.Deferred();
             
-            if (epubConfig.cover) {
-                JSZipUtils.getBinaryContent(baseUrl + '/EPUB/wasteland-cover.jpg', function (err, data) {
+            if (epubConfig.coverUrl) {
+                JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
                     if (!err) {
                         zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
                         p.resolve('');
