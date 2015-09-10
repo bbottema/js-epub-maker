@@ -4,7 +4,9 @@
 
 `js-epub-maker` will allow you to create and download epubs. It offers an API through which you can set meta info, navigation and content. `js-epub-maker` works by gutting [IDPF's sample epub](http://idpf.github.io/epub3-samples/) and refitting it with your content. The source epub this project is working with is [The Waste Land](http://idpf.github.io/epub3-samples/samples.html#wasteland) ([source code](https://github.com/IDPF/epub3-samples/tree/master/30/wasteland)).
 
-## API example from the included [test page](https://github.com/bbottema/js-epub-maker/blob/master/src/test/test-script.js)
+## API example
+
+Taken from the included [test page](https://github.com/bbottema/js-epub-maker/blob/master/src/test/test-script.js).
 
 ```javascript
     new EpubMaker()
