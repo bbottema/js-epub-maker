@@ -9,19 +9,16 @@
 	<body>
 		<nav epub:type="toc" id="toc">
 			<ol>
-				<li><a href="{{slug}}-content.xhtml#ch1">I. THE BURIAL OF THE DEAD</a></li>
-				<li><a href="{{slug}}-content.xhtml#ch2">II. A GAME OF CHESS</a></li>
-				<li><a href="{{slug}}-content.xhtml#ch3">III. THE FIRE SERMON</a></li>
-				<li><a href="{{slug}}-content.xhtml#ch4">IV. DEATH BY WATER</a></li>
-				<li><a href="{{slug}}-content.xhtml#ch5">V. WHAT THE THUNDER SAID</a></li>
-				<li><a href="{{slug}}-content.xhtml#rearnotes">NOTES ON "THE WASTE LAND"</a></li>
+				{{#each toc}}
+				<li><a href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>
+				{{/each}}
 			</ol>			
 		</nav>
 		<nav epub:type="landmarks">
 			<ol>
-				<li><a epub:type="frontmatter" href="{{slug}}-content.xhtml#frontmatter">frontmatter</a></li>
-				<li><a epub:type="bodymatter" href="{{slug}}-content.xhtml#bodymatter">bodymatter</a></li>
-				<li><a epub:type="backmatter" href="{{slug}}-content.xhtml#backmatter">backmatter</a></li>
+				{{#each landmarks}}
+				<li><a epub:type="{{epubType}}" href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>
+				{{/each}}
 			</ol>
 		</nav>
 	</body>

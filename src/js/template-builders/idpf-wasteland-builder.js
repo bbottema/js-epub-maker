@@ -88,9 +88,14 @@
         }
         
         function addContent(zip, epubConfig) {
-            return $.get(baseUrl + '/EPUB/wasteland-content.xhtml', function(file) {
-               zip.folder('EPUB').file(epubConfig.slug + '-content.xhtml', Handlebars.compile(file)(epubConfig));
-            }, 'text');
+            var f = function(v) { return v; };
+            return $.when(
+                $.get(baseUrl + '/EPUB/sections-template.xhtml', f, 'text').then(f),
+                $.get(baseUrl + '/EPUB/wasteland-content.xhtml', f, 'text').then(f)
+            ).then(function(f1, f2) {
+                Handlebars.registerPartial("sectionTemplate", f1);
+                zip.folder('EPUB').file(epubConfig.slug + '-content.xhtml', Handlebars.compile(f2)(epubConfig));
+            });
         }
     };
 

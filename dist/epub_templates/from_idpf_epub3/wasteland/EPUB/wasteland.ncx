@@ -9,41 +9,13 @@
     </docTitle>
     <navMap>
         <!-- 2.01 NCX: playOrder is optional -->
-        <navPoint id="ch1">
+		{{#each toc}}
+        <navPoint id="{{id}}">
             <navLabel>
-                <text>I. THE BURIAL OF THE DEAD</text>
+                <text>{{content.title}}</text>
             </navLabel>
-            <content src="{{slug}}-content.xhtml#ch1"/>
+            <content src="{{../slug}}-content.xhtml#{{id}}"/>
         </navPoint>
-        <navPoint id="ch2">
-            <navLabel>
-                <text>II. A GAME OF CHESS</text>
-            </navLabel>
-            <content src="{{slug}}-content.xhtml#ch2"/>
-        </navPoint>
-        <navPoint id="ch3">
-            <navLabel>
-                <text>III. THE FIRE SERMON</text>
-            </navLabel>
-            <content src="{{slug}}-content.xhtml#ch3"/>
-        </navPoint>
-        <navPoint id="ch4">
-            <navLabel>
-                <text>IV. DEATH BY WATER</text>
-            </navLabel>
-            <content src="{{slug}}-content.xhtml#ch4"/>
-        </navPoint>
-        <navPoint id="ch5">
-            <navLabel>
-                <text>V. WHAT THE THUNDER SAID</text>
-            </navLabel>
-            <content src="{{slug}}-content.xhtml#ch5"/>
-        </navPoint>
-        <navPoint id="rearnotes">
-            <navLabel>
-                <text>NOTES ON "THE WASTE LAND"</text>
-            </navLabel>
-            <content src="{{slug}}-content.xhtml#rearnotes"/>
-        </navPoint>
+		{{/each}}
     </navMap>
 </ncx>

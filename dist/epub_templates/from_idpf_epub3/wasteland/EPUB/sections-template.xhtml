@@ -1,0 +1,6 @@
+<section {{#if epubType}}epub:type="{{epubType}}" {{/if}} id="{{id}}">
+    {{#if content.title}}
+    <h2>{{content.title}}</h2>{{/if}} {{#if content.content}}{{{content.content}}}{{/if}}
+    
+    {{#each subSections}} {{> sectionTemplate}} {{/each}}
+</section>
