@@ -52,6 +52,17 @@ new EpubMaker()
 
 There is some API to set all the meta-data, but the magic in the way you can add *sections*. With sections you can add either all content with just one section, or finetune all the content so that it snugly fits the epub spec (with the various epub types described in the spec) and more importantly allows you to indicate exactly what should be included in the TOC and Landmarks section of the epub. You don't need to take care of all that, `js-epub-maker` will do that for you.
 
+```javascript
+/**
+ * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
+ * @id Optional, but required if section should be included in toc and / or landmarks
+ * @content Optional. Should not be empty if there will be no subsections added to this ection
+ */
+EpubMaker.Section = function(epubType, id, content, includeInToc, includeInLandmarks) {
+    ...
+}
+```
+
 [license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
 [license-url]: LICENSE
 
