@@ -18,7 +18,6 @@ window.runTest = function() {
 };
     
 function createTestEpub(coverImg, header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
-    // FIXME add way to include custom jpg for cover
     new EpubMaker()
         .withUuid('github.com/bbottema/js-epub-maker::it-came-from::example-using-idpf-wasteland')
         .withTemplate('idpf-wasteland')
