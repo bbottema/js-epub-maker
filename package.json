@@ -43,6 +43,7 @@
     "gulp-coveralls": "~0.1.4",
     "gulp-size": "1.2.1",
     "gulp-util": "3.0.5",
-    "gulp-js-text-inject": "1.0.0"
+    "gulp-js-text-inject": "1.0.0",
+    "d.js": "0.7.3"
   }
 }

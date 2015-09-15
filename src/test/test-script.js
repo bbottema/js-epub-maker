@@ -17,7 +17,7 @@ window.runTest = function() {
     ).then(createTestEpub);
 };
     
-function createTestEpub(coverImg, header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
+function createTestEpub(header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
     new EpubMaker()
         .withUuid('github.com/bbottema/js-epub-maker::it-came-from::example-using-idpf-wasteland')
         .withTemplate('idpf-wasteland')

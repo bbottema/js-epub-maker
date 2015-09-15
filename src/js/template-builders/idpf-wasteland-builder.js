@@ -1,6 +1,9 @@
-/* global module, exports, $, JSZip, JSZipUtils, Handlebars, html_beautify */
+/* global module, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
 (function() {
     'use strict';
+    
+    var D = require('d.js');
+    var console = require('../../js/console')();
     
     var templates = {
         mimetype: '@@import src/epub_templates/from_idpf_epub3/wasteland/mimetype',
@@ -8,7 +11,7 @@
         opf: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland.opf',
         ncx: '@@import src/epub_templates/from_idpf_epub3/wasteland//EPUB/wasteland.ncx',
         nav: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-nav.xhtml',
-        css: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-night.css',
+        css: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland.css',
         cssNight: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-night.css',
         content: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-content.xhtml',
         sectionsTemplate: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/sections-template.xhtml'
@@ -16,13 +19,12 @@
     
     var Builder = function() {
         
-        
         this.make = function(epubConfig) {
             console.debug('building epub', epubConfig);
             var zip = new JSZip();
             
-            var deferred = $.Deferred();
-            $.when(
+            var deferred = D();
+            D.all(
                 addMimetype(zip, epubConfig),
                 addContainerInfo(zip, epubConfig),
                 addManifestOpf(zip, epubConfig),
@@ -35,7 +37,7 @@
                 deferred.resolve(zip);
             });
             
-            return deferred.promise();
+            return deferred.promise;
         };
         
         function addMimetype(zip, epubConfig) {
@@ -51,7 +53,7 @@
         }
         
         function addCover(zip, epubConfig) {
-            var p = $.Deferred();
+            var p = D();
             
             if (epubConfig.coverUrl) {
                 JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
@@ -65,7 +67,7 @@
             } else {
                 p.resolve('');
             }
-            return p.promise();
+            return p.promise;
         }
         
         function addEpub2Nav(zip, epubConfig) {

@@ -1,10 +1,9 @@
-/* global require, module, console, exports, saveAs */
+/* global require, module, exports, saveAs */
 (function() {
     'use strict';
     
-    var log = (typeof(console) !== 'undefined' && console.debug) ? 
-        function () { console.debug.apply(console, arguments); } : function() {};
-    var slugify = require('./js/slugify.js');
+    var console = require('./js/console')();
+    var slugify = require('./js/slugify');
     
     var templateManagers = {
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
@@ -71,7 +70,7 @@
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
-    			log('generating epub for: ' + epubConfig.title);
+    			console.info('generating epub for: ' + epubConfig.title);
     			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
     			return content;
             });
@@ -80,7 +79,7 @@
         this.downloadEpub = function() {
             self.makeEpub().then(function(epubZipContent) {
     			var filename = epubConfig.slug + '.epub';
-    			log('saving "' + filename + '"...');
+    			console.debug('saving "' + filename + '"...');
     			saveAs(epubZipContent, filename);
             });
         };
