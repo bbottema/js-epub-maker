@@ -1,1 +1,0 @@
-These templates are taken from http://idpf.github.io/epub3-samples/ and converted into templates for the purpose of generating new epubs.

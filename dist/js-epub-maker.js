@@ -153,11 +153,21 @@
     }
 }());
 },{}],3:[function(require,module,exports){
-/* global module, exports, $, JSZip, JSZipUtils, Handlebars */
+/* global module, exports, $, JSZip, JSZipUtils, Handlebars, html_beautify */
 (function() {
     'use strict';
     
-    var baseUrl = 'dist/epub_templates/from_idpf_epub3/wasteland';
+    var templates = {
+        mimetype: 'application/epub+zip',
+        container: '<?xml version="1.0" encoding="UTF-8"?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n	<rootfiles>\n		<rootfile full-path="EPUB/{{slug}}.opf" 	\n			media-type="application/oebps-package+xml"/>\n	</rootfiles>\n</container>',
+        opf: '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">\n    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n        <dc:identifier id="uid">{{uuid}}</dc:identifier>\n        <dc:title>{{title}}</dc:title>\n        <dc:creator>{{author}}</dc:creator>\n        <dc:language>{{lang}}</dc:language>\n        <dc:date>{{publicationDate}}</dc:date>\n        <meta property="dcterms:modified">{{modificationDate}}</meta>\n        {{#if rights}}\n            <!-- rights expressions for the work as a whole -->\n            {{#if rights.description}}<dc:rights>{{rights.description}}</dc:rights>{{/if}}\n            {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}\n            {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}\n        {{/if}}\n        {{#if coverUrl}}{{#if coverRights}}\n            <!-- rights expression for the cover image -->       \n            {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}\n            {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}\n            <!-- cover meta element included for 2.0 reading system compatibility: -->\n            <meta name="cover" content="cover"/>\n        {{/if}}{{/if}}\n    </metadata>\n    <manifest>\n        <item id="t1" href="{{slug}}-content.xhtml" media-type="application/xhtml+xml" />\n        <item id="nav" href="{{slug}}-nav.xhtml" properties="nav" media-type="application/xhtml+xml" />\n        {{#if coverUrl}}\n        <item id="cover" href="{{slug}}-cover.jpg" media-type="image/jpeg" properties="cover-image" />\n        {{/if}}\n        <item id="css" href="{{slug}}.css" media-type="text/css" />\n        <item id="css-night" href="{{slug}}-night.css" media-type="text/css" />\n        <!-- ncx included for 2.0 reading system compatibility: -->\n        <item id="ncx" href="{{slug}}.ncx" media-type="application/x-dtbncx+xml" />\n    </manifest>\n    <spine toc="ncx">\n        <itemref idref="t1" />        \n    </spine>    \n</package>\n',
+        ncx: '<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/"\n    version="2005-1" xml:lang="en">\n    <head>\n        <meta name="dtb:uid" content="{{uuid}}"/>\n    </head>\n    <docTitle>\n        <text>{{title}}</text>\n    </docTitle>\n    <navMap>\n        <!-- 2.01 NCX: playOrder is optional -->\n		{{#each toc}}\n        <navPoint id="{{id}}">\n            <navLabel>\n                <text>{{content.title}}</text>\n            </navLabel>\n            <content src="{{../slug}}-content.xhtml#{{id}}"/>\n        </navPoint>\n		{{/each}}\n    </navMap>\n</ncx>\n',
+        nav: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"\n	xmlns:epub="http://www.idpf.org/2007/ops">\n	<head>\n		<meta charset="utf-8"></meta>		\n		<link rel="stylesheet" type="text/css" href="{{slug}}.css" class="day" title="day"/> \n		<link rel="alternate stylesheet" type="text/css" href="{{slug}}-night.css" class="night" title="night"/>		\n	</head>\n	<body>\n		<nav epub:type="toc" id="toc">\n			<ol>\n				{{#each toc}}\n				<li><a href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>\n				{{/each}}\n			</ol>			\n		</nav>\n		<nav epub:type="landmarks">\n			<ol>\n				{{#each landmarks}}\n				<li><a epub:type="{{epubType}}" href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>\n				{{/each}}\n			</ol>\n		</nav>\n	</body>\n</html>\n',
+        css: '@charset "UTF-8";\n@import "{{slug}}.css";\n\nbody {\n    color: rgb(255,250,205);\n    background-color: rgb(20,20,20);\n}\n\nspan.lnum {\n    color: rgb(175,170,125);\n}\n\na.noteref {\n    color: rgb(120,120,120);\n}\n\nsection#rearnotes a {\n    color: rgb(255,250,205);\n}',
+        cssNight: '@charset "UTF-8";\n@import "{{slug}}.css";\n\nbody {\n    color: rgb(255,250,205);\n    background-color: rgb(20,20,20);\n}\n\nspan.lnum {\n    color: rgb(175,170,125);\n}\n\na.noteref {\n    color: rgb(120,120,120);\n}\n\nsection#rearnotes a {\n    color: rgb(255,250,205);\n}',
+        content: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:epub="http://www.idpf.org/2007/ops">\n	<head>\n		<meta charset="utf-8"></meta>\n		<title>{{title}}</title>\n		<link rel="stylesheet" type="text/css" href="{{slug}}.css" class="day" title="day"/> \n		<link rel="alternate stylesheet" type="text/css" href="{{slug}}-night.css" class="night" title="night"/>\n		<!-- <link rel="stylesheet" type="text/css" href="{{slug}}-night.css" class="night" title="night"/> -->		\n	</head>\n	<body>\n		{{#each sections}}{{> sectionTemplate}}{{/each}}\n	</body>\n</html>\n',
+        sectionsTemplate: '<!-- strange if-construction, but this is a workaround for gulp-js-html-inject, whose minifier wreaks havoc otherwise -->\n{{#if epubType}}<section epub:type="{{epubType}}" id="{{id}}">{{else}}<section id="{{id}}">{{/if}}\n\n    {{#if content.title}}<h2>{{content.title}}</h2>{{/if}} \n    {{#if content.content}}{{{content.content}}}{{/if}}\n    \n    {{#each subSections}} {{> sectionTemplate}} {{/each}}\n    \n{{#if epubType}}</section>{{else}}</section>{{/if}}'
+    };
     
     var Builder = function() {
         
@@ -184,21 +194,15 @@
         };
         
         function addMimetype(zip, epubConfig) {
-            return $.get(baseUrl + '/mimetype', function(file) {
-               zip.file('mimetype', file);
-            }, 'text');
+            zip.file('mimetype', templates.mimetype);
         }
         
         function addContainerInfo(zip, epubConfig) {
-            return $.get(baseUrl + '/META-INF/container.xml', function(file) {
-               zip.folder('META-INF').file('container.xml', Handlebars.compile(file)(epubConfig));
-            }, 'text');
+            zip.folder('META-INF').file('container.xml', compile(templates.container, epubConfig));
         }
         
         function addManifestOpf(zip, epubConfig) {
-            return $.get(baseUrl + '/EPUB/wasteland.opf', function(file) {
-               zip.folder('EPUB').file(epubConfig.slug + '.opf', Handlebars.compile(file)(epubConfig));
-            }, 'text');
+            zip.folder('EPUB').file(epubConfig.slug + '.opf', compile(templates.opf, epubConfig));
         }
         
         function addCover(zip, epubConfig) {
@@ -220,37 +224,40 @@
         }
         
         function addEpub2Nav(zip, epubConfig) {
-            return $.get(baseUrl + '/EPUB/wasteland.ncx', function(file) {
-               zip.folder('EPUB').file(epubConfig.slug + '.ncx', Handlebars.compile(file)(epubConfig));
-            }, 'text');
+            zip.folder('EPUB').file(epubConfig.slug + '.ncx', compile(templates.ncx, epubConfig));
         }
         
         function addEpub3Nav(zip, epubConfig) {
-            return $.get(baseUrl + '/EPUB/wasteland-nav.xhtml', function(file) {
-               zip.folder('EPUB').file(epubConfig.slug + '-nav.xhtml', Handlebars.compile(file)(epubConfig));
-            }, 'text');
+            zip.folder('EPUB').file(epubConfig.slug + '-nav.xhtml', compile(templates.nav, epubConfig));
         }
         
         function addStylesheets(zip, epubConfig) {
-            return $.when(
-                $.get(baseUrl + '/EPUB/wasteland.css', function(file) {
-                   zip.folder('EPUB').file(epubConfig.slug + '.css', Handlebars.compile(file)(epubConfig));
-                }, 'text'),
-                $.get(baseUrl + '/EPUB/wasteland-night.css', function(file) {
-                   zip.folder('EPUB').file(epubConfig.slug + '-night.css', Handlebars.compile(file)(epubConfig));
-                }, 'text')
-            );
+            zip.folder('EPUB').file(epubConfig.slug + '.css', compile(templates.css, epubConfig, true));
+            zip.folder('EPUB').file(epubConfig.slug + '-night.css', compile(templates.cssNight, epubConfig, true));
         }
         
         function addContent(zip, epubConfig) {
-            var f = function(v) { return v; };
-            return $.when(
-                $.get(baseUrl + '/EPUB/sections-template.xhtml', f, 'text').then(f),
-                $.get(baseUrl + '/EPUB/wasteland-content.xhtml', f, 'text').then(f)
-            ).then(function(f1, f2) {
-                Handlebars.registerPartial("sectionTemplate", f1);
-                zip.folder('EPUB').file(epubConfig.slug + '-content.xhtml', Handlebars.compile(f2)(epubConfig));
-            });
+            Handlebars.registerPartial("sectionTemplate", templates.sectionsTemplate);
+            zip.folder('EPUB').file(epubConfig.slug + '-content.xhtml', compile(templates.content, epubConfig));
+        }
+        
+        function compile(template, content, skipFormatting) {
+            return formatHTML(Handlebars.compile(template)(content));
+            
+            function formatHTML(htmlstr) {
+                return (skipFormatting || typeof html_beautify === 'undefined') ? htmlstr : 
+                    html_beautify(htmlstr, {
+                        end_with_newline: false,
+                        indent_char: "\t",
+                        indent_inner_html: true,
+                        indent_size: "1",
+                        preserve_newlines: false,
+                        wrap_line_length: "0",
+                        unformatted: [],
+                        selector_separator_newline: false,
+                        newline_between_rules: true
+                    });
+            }
         }
     };
 
