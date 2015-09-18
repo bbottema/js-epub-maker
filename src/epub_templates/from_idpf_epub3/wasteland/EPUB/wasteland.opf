@@ -13,13 +13,15 @@
             {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}
             {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}
         {{/if}}
-        {{#if coverUrl}}{{#if coverRights}}
-            <!-- rights expression for the cover image -->       
-            {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}
-            {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}
-            <!-- cover meta element included for 2.0 reading system compatibility: -->
-            <meta name="cover" content="cover"/>
-        {{/if}}{{/if}}
+        {{#if coverUrl}}
+            {{#if coverRights}}
+                <!-- rights expression for the cover image -->       
+                {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}
+                {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}
+            {{/if}}
+                <!-- cover meta element included for 2.0 reading system compatibility: -->
+                <meta name="cover" content="cover"/>
+        {{/if}}
     </metadata>
     <manifest>
         <item id="t1" href="{{slug}}-content.xhtml" media-type="application/xhtml+xml" />
