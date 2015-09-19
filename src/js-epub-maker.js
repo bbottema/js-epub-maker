@@ -2,8 +2,8 @@
 (function() {
     'use strict';
     
-    var console = require('./js/console')();
-    var slugify = require('./js/slugify');
+    var console = require('./js/util/console')();
+    var slugify = require('./js/util/slugify');
     
     var templateManagers = {
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
@@ -84,6 +84,9 @@
             });
         };
     };
+    
+    // epubtypes and descriptions, useful for vendors implementing a GUI
+    EpubMaker.epuptypes = require("../src/js/epub-types.js");
     
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]

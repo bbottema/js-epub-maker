@@ -3,7 +3,7 @@
     'use strict';
     
     var D = require('d.js');
-    var console = require('../../js/console')();
+    var console = require('../../js/util/console')();
     
     var templates = {
         mimetype: '@@import src/epub_templates/from_idpf_epub3/wasteland/mimetype',

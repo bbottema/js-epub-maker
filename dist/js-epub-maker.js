@@ -3,8 +3,8 @@
 (function() {
     'use strict';
     
-    var console = require('./js/console')();
-    var slugify = require('./js/slugify');
+    var console = require('./js/util/console')();
+    var slugify = require('./js/util/slugify');
     
     var templateManagers = {
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
@@ -86,6 +86,9 @@
         };
     };
     
+    // epubtypes and descriptions, useful for vendors implementing a GUI
+    EpubMaker.epuptypes = require("../src/js/epub-types.js");
+    
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
      * @id Optional, but required if section should be included in toc and / or landmarks
@@ -137,7 +140,7 @@
         window.EpubMaker = EpubMaker;
     }
 }());
-},{"../src/js/template-builders/idpf-wasteland-builder.js":6,"./js/console":4,"./js/slugify":5}],2:[function(require,module,exports){
+},{"../src/js/epub-types.js":4,"../src/js/template-builders/idpf-wasteland-builder.js":5,"./js/util/console":6,"./js/util/slugify":7}],2:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -689,40 +692,106 @@ process.umask = function() { return 0; };
 
 }).call(this,require('_process'))
 },{"_process":2}],4:[function(require,module,exports){
-/* global console */
-(function() {
-    module.exports = function() { 
-        return (typeof(console) !== 'undefined') ? console : 
-            { log: f, info: f, debug: f, warn: f, error: f };
-    };
-    function f() {} 
-}());
+var epubtypes = [
+   {
+      "name":"abstract",
+      "type":"ABSTRACT",
+      "group": "Front Matter",
+      "description":"A short summary of the principle ideas, concepts and conclusions of the work, or of a section or except within it."
+   },
+   {
+      "name":"foreword",
+      "type":"FOREWORD",
+      "group": "Front Matter",
+      "description":"An introductory section that precedes the work, typically not written by the work's author."
+   },
+   {
+      "name":"preface",
+      "type":"PREFACE",
+      "group": "Front Matter",
+      "description":"An introductory section that precedes the work, typically written by the work's author."
+   },
+   {
+      "name":"introduction",
+      "type":"INTRODUCTION",
+      "group": "Front Matter",
+      "description":"A section in the beginning of the work, typically introducing the reader to the scope or nature of the work's content."
+   },
+   {
+      "name":"preamble",
+      "type":"PREAMBLE",
+      "group": "Front Matter",
+      "description":"A section in the beginning of the work, typically containing introductory and/or explanatory prose regarding the scope or nature of the work's content"
+   },
+   {
+      "name":"epigraph",
+      "type":"EPIGRAPH",
+      "group": "Front Matter",
+      "description":"A quotation that is pertinent but not integral to the text."
+   },
+   {
+      "name":"non-specific frontmatter",
+      "type":"FRONTMATTER-GENERIC",
+      "group": "Front Matter",
+      "description": "Content placed in the frontmatter section, but which has no specific semantic meaning."
+   },
+   {
+      "name":"prologue",
+      "type":"PROLOGUE",
+      "group": "Body Matter",
+      "description":"An introductory section that sets the background to a story, typically part of the narrative."
+   },
+   {
+      "name":"conclusion",
+      "type":"CONCLUSION",
+      "group": "Body Matter",
+      "description":"An ending section that typically wraps up the work."
+   },
+   {
+      "name":"epilogue",
+      "type":"EPILOGUE",
+      "group": "Body Matter",
+      "description":"A concluding section that is typically written from a later point in time than the main story, although still part of the narrative."
+   },
+   {
+      "name":"afterword",
+      "type":"AFTERWORD",
+      "group": "Back Matter",
+      "description":"A closing statement from the author or a person of importance to the story, typically providing insight into how the story came to be written, its significance or related events that have transpired since its timeline."
+   },
+   {
+      "name":"non-specific backmatter",
+      "type":"BACKMATTER-GENERIC",
+      "group": "Back Matter",
+      "description": "Content placed in the backmatter section, but which has no specific semantic meaning."
+   },
+   {
+      "name":"rearnote",
+      "type":"REARNOTE",
+      "group": "Back Matter",
+      "description":"A note appearing in the rear (backmatter) of the work, or at the end of a section."
+   }
+];
+
+var groups = {};
+for (var i in epubtypes) {
+    var group = epubtypes[i].group;
+    (groups[group] || (groups[group] = [])).push(epubtypes[i]);
+}
+
+module.exports = { types: epubtypes, groups: groups };
 },{}],5:[function(require,module,exports){
-/* global s, console */
-(function() {
-    module.exports = (typeof(s) !== 'undefined' && s.slugify) ? s.slugify : simpleSlugify;
-    
-    if (module.exports === simpleSlugify) {
-        var log = (typeof(console) !== 'undefined' && console.debug) ? console.debug : function() {};
-        log.call(console, 'underscore.string not found, falling back on (very) simple slugify..');
-    }
-    
-    function simpleSlugify(str) {
-        return str.toLowerCase().replace(/\s\W/g, '-');
-    }
-}());
-},{}],6:[function(require,module,exports){
 /* global module, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
 (function() {
     'use strict';
     
     var D = require('d.js');
-    var console = require('../../js/console')();
+    var console = require('../../js/util/console')();
     
     var templates = {
         mimetype: 'application/epub+zip',
         container: '<?xml version="1.0" encoding="UTF-8"?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n	<rootfiles>\n		<rootfile full-path="EPUB/{{slug}}.opf" 	\n			media-type="application/oebps-package+xml"/>\n	</rootfiles>\n</container>',
-        opf: '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">\n    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n        <dc:identifier id="uid">{{uuid}}</dc:identifier>\n        <dc:title>{{title}}</dc:title>\n        <dc:creator>{{author}}</dc:creator>\n        <dc:language>{{lang}}</dc:language>\n        <dc:date>{{publicationDate}}</dc:date>\n        <meta property="dcterms:modified">{{modificationDate}}</meta>\n        {{#if rights}}\n            <!-- rights expressions for the work as a whole -->\n            {{#if rights.description}}<dc:rights>{{rights.description}}</dc:rights>{{/if}}\n            {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}\n            {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}\n        {{/if}}\n        {{#if coverUrl}}{{#if coverRights}}\n            <!-- rights expression for the cover image -->       \n            {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}\n            {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}\n            <!-- cover meta element included for 2.0 reading system compatibility: -->\n            <meta name="cover" content="cover"/>\n        {{/if}}{{/if}}\n    </metadata>\n    <manifest>\n        <item id="t1" href="{{slug}}-content.xhtml" media-type="application/xhtml+xml" />\n        <item id="nav" href="{{slug}}-nav.xhtml" properties="nav" media-type="application/xhtml+xml" />\n        {{#if coverUrl}}\n        <item id="cover" href="{{slug}}-cover.jpg" media-type="image/jpeg" properties="cover-image" />\n        {{/if}}\n        <item id="css" href="{{slug}}.css" media-type="text/css" />\n        <item id="css-night" href="{{slug}}-night.css" media-type="text/css" />\n        <!-- ncx included for 2.0 reading system compatibility: -->\n        <item id="ncx" href="{{slug}}.ncx" media-type="application/x-dtbncx+xml" />\n    </manifest>\n    <spine toc="ncx">\n        <itemref idref="t1" />        \n    </spine>    \n</package>\n',
+        opf: '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">\n    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n        <dc:identifier id="uid">{{uuid}}</dc:identifier>\n        <dc:title>{{title}}</dc:title>\n        <dc:creator>{{author}}</dc:creator>\n        <dc:language>{{lang}}</dc:language>\n        <dc:date>{{publicationDate}}</dc:date>\n        <meta property="dcterms:modified">{{modificationDate}}</meta>\n        {{#if rights}}\n            <!-- rights expressions for the work as a whole -->\n            {{#if rights.description}}<dc:rights>{{rights.description}}</dc:rights>{{/if}}\n            {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}\n            {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}\n        {{/if}}\n        {{#if coverUrl}}\n            {{#if coverRights}}\n                <!-- rights expression for the cover image -->       \n                {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}\n                {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}\n            {{/if}}\n                <!-- cover meta element included for 2.0 reading system compatibility: -->\n                <meta name="cover" content="cover"/>\n        {{/if}}\n    </metadata>\n    <manifest>\n        <item id="t1" href="{{slug}}-content.xhtml" media-type="application/xhtml+xml" />\n        <item id="nav" href="{{slug}}-nav.xhtml" properties="nav" media-type="application/xhtml+xml" />\n        {{#if coverUrl}}\n        <item id="cover" href="{{slug}}-cover.jpg" media-type="image/jpeg" properties="cover-image" />\n        {{/if}}\n        <item id="css" href="{{slug}}.css" media-type="text/css" />\n        <item id="css-night" href="{{slug}}-night.css" media-type="text/css" />\n        <!-- ncx included for 2.0 reading system compatibility: -->\n        <item id="ncx" href="{{slug}}.ncx" media-type="application/x-dtbncx+xml" />\n    </manifest>\n    <spine toc="ncx">\n        <itemref idref="t1" />        \n    </spine>    \n</package>\n',
         ncx: '<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/"\n    version="2005-1" xml:lang="en">\n    <head>\n        <meta name="dtb:uid" content="{{uuid}}"/>\n    </head>\n    <docTitle>\n        <text>{{title}}</text>\n    </docTitle>\n    <navMap>\n        <!-- 2.01 NCX: playOrder is optional -->\n		{{#each toc}}\n        <navPoint id="{{id}}">\n            <navLabel>\n                <text>{{content.title}}</text>\n            </navLabel>\n            <content src="{{../slug}}-content.xhtml#{{id}}"/>\n        </navPoint>\n		{{/each}}\n    </navMap>\n</ncx>\n',
         nav: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"\n	xmlns:epub="http://www.idpf.org/2007/ops">\n	<head>\n		<meta charset="utf-8"></meta>		\n		<link rel="stylesheet" type="text/css" href="{{slug}}.css" class="day" title="day"/> \n		<link rel="alternate stylesheet" type="text/css" href="{{slug}}-night.css" class="night" title="night"/>		\n	</head>\n	<body>\n		<nav epub:type="toc" id="toc">\n			<ol>\n				{{#each toc}}\n				<li><a href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>\n				{{/each}}\n			</ol>			\n		</nav>\n		<nav epub:type="landmarks">\n			<ol>\n				{{#each landmarks}}\n				<li><a epub:type="{{epubType}}" href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>\n				{{/each}}\n			</ol>\n		</nav>\n	</body>\n</html>\n',
         css: '@charset "UTF-8";\n@namespace "http://www.w3.org/1999/xhtml";\n@namespace epub "http://www.idpf.org/2007/ops";\n\nbody {\n    margin-left: 6em;\n    margin-right: 2em;\n    color: black;    \n    font-family: times, \'times new roman\', serif;    \n    background-color: rgb(255,255,245);\n    line-height: 1.5em;\n}\n\nh2 {\n    margin-top: 5em;\n    margin-bottom: 2em;\n}\n\nh3 {\n    margin-top: 3em;\n}\n\n.linegroup { \n    margin-top: 1.6em; \n}\n\nspan.lnum {\n    float: right;\n    color: gray;\n    font-size : 90%;\n}\n\na.noteref {    \n    color: rgb(215,215,195);\n    text-decoration: none;\n    margin-left: 0.5em;\n    margin-right: 0.5em;\n}\n\nsection#rearnotes a {\n    color: black;\n    text-decoration: none;\n    border-bottom : 1px dotted gray;\n    margin-right: 0.8em;\n}\n\n.indent {\n    padding-left: 3em;\n}\n\n.indent2 {\n    padding-left: 5em;\n}\n\n*[epub|type~=\'dedication\'] {\n    padding-left: 2em;\n}\n',
@@ -837,4 +906,27 @@ process.umask = function() { return 0; };
         window.epubMaker = new Builder();
     }
 }());
-},{"../../js/console":4,"d.js":3}]},{},[1]);
+},{"../../js/util/console":6,"d.js":3}],6:[function(require,module,exports){
+/* global console */
+(function() {
+    module.exports = function() { 
+        return (typeof(console) !== 'undefined') ? console : 
+            { log: f, info: f, debug: f, warn: f, error: f };
+    };
+    function f() {} 
+}());
+},{}],7:[function(require,module,exports){
+/* global s, console */
+(function() {
+    module.exports = (typeof(s) !== 'undefined' && s.slugify) ? s.slugify : simpleSlugify;
+    
+    if (module.exports === simpleSlugify) {
+        var log = (typeof(console) !== 'undefined' && console.debug) ? console.debug : function() {};
+        log.call(console, 'underscore.string not found, falling back on (very) simple slugify..');
+    }
+    
+    function simpleSlugify(str) {
+        return str.toLowerCase().replace(/\s\W/g, '-');
+    }
+}());
+},{}]},{},[1]);
