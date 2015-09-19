@@ -1,6 +1,5 @@
 {
   "name": "epub-maker",
-  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/bbottema/epub-maker.git"
@@ -8,7 +7,7 @@
   "authors": [
     "Benny Bottema (http://blog.projectnibble.org/)"
   ],
-  "main": "./dist/epub-maker.min.js",
+  "main": "./dist/js-epub-maker.min.js",
   "dependencies": {
     "FileSaver.js": "~0.0.2",
     "handlebars": "~4.0.0",
