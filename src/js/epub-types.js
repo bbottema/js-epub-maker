@@ -1,3 +1,4 @@
+// source: http://www.idpf.org/epub/vocab/structure/epub-vocab-structure-20150826.html
 var epubtypes = [
    {
       "name":"abstract",
