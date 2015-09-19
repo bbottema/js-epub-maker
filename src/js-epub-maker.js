@@ -91,7 +91,7 @@
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
      * @id Optional, but required if section should be included in toc and / or landmarks
-     * @content Optional. Should not be empty if there will be no subsections added to this ection
+     * @content Optional. Should not be empty if there will be no subsections added to this section
      */
     EpubMaker.Section = function(epubType, id, content, includeInToc, includeInLandmarks) {
         var self = this;
