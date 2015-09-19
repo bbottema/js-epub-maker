@@ -9,7 +9,7 @@
   ],
   "main": "./dist/js-epub-maker.min.js",
   "dependencies": {
-    "FileSaver.js": "~0.0.2",`
+    "FileSaver.js": "~0.0.2",
     "handlebars": "~4.0.0",
     "jszip": "~2.5.0",
     "jszip-utils": "~0.0.2"
