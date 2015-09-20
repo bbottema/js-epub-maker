@@ -43,6 +43,18 @@ var epubtypes = [
       "description": "Content placed in the frontmatter section, but which has no specific semantic meaning."
    },
    {
+      "name":"part",
+      "type":"PART",
+      "group": "Body Matter",
+      "description":"An introductory section that sets the background to a story, typically part of the narrative."
+   },
+   {
+      "name":"chapter",
+      "type":"CHAPTER",
+      "group": "Body Matter",
+      "description":"An introductory section that sets the background to a story, typically part of the narrative."
+   },
+   {
       "name":"prologue",
       "type":"PROLOGUE",
       "group": "Body Matter",
