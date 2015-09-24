@@ -893,7 +893,8 @@ process.umask = function() { return 0; };
             if (epubConfig.coverUrl) {
                 JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
                     if (!err) {
-                        zip.folder('EPUB').file(epubConfig.slug + '-cover.jpg', data, { binary: true });
+                        var ext = epubConfig.coverUrl.substr(epubConfig.coverUrl.lastIndexOf('.') + 1);
+                        zip.folder('EPUB').file(epubConfig.slug + '-cover.' + ext, data, { binary: true });
                         p.resolve('');
                     } else {
                         p.reject(err);
