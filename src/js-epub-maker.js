@@ -5,6 +5,8 @@
     var console = require('./js/util/console')();
     var slugify = require('./js/util/slugify');
     
+    require('./js/util/handlebar-helpers');
+    
     var templateManagers = {
         'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
     };

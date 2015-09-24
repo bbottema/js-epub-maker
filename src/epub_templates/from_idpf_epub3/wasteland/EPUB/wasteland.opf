@@ -27,7 +27,7 @@
         <item id="t1" href="{{slug}}-content.xhtml" media-type="application/xhtml+xml" />
         <item id="nav" href="{{slug}}-nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
         {{#if coverUrl}}
-        <item id="cover" href="{{slug}}-cover.jpg" media-type="image/jpeg" properties="cover-image" />
+        <item id="cover" href="{{slug}}-cover.{{extension coverUrl}}" media-type="{{mimetype coverUrl}}" properties="cover-image" />
         {{/if}}
         <item id="css" href="{{slug}}.css" media-type="text/css" />
         <item id="css-night" href="{{slug}}-night.css" media-type="text/css" />
