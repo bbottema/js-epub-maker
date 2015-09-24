@@ -17,7 +17,7 @@
 		<nav epub:type="landmarks">
 			<ol>
 				{{#each landmarks}}
-				<li><a epub:type="{{epubType}}" href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>
+				<li><a epub:type="{{epubType}}" href="{{../slug}}-content.xhtml#{{id}}">{{#if content.title}}{{content.title}}{{else}}{{epubType}}{{/if}}</a></li>
 				{{/each}}
 			</ol>
 		</nav>
