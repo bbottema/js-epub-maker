@@ -86,7 +86,7 @@
     };
     
     // epubtypes and descriptions, useful for vendors implementing a GUI
-    EpubMaker.epuptypes = require("../src/js/epub-types.js");
+    EpubMaker.epubtypes = require("../src/js/epub-types.js");
     
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
