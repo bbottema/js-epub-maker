@@ -119,9 +119,22 @@
       }[epubtype];
    }
    
+   function getActualType(type) {
+      if (!type) {
+         return null;
+      }
+      for (var i = 0; i < epubtypes.length; i++) {
+         if (epubtypes[i].type === type) {
+            return epubtypes[i].name;
+         }
+      }
+      throw new Error('unknown epub type identifier: ' + type);
+   }
+   
    module.exports = { 
       types: epubtypes, 
       groups: groups,
-      getGroup: getGroup
+      getGroup: getGroup,
+      getActualType: getActualType
    };
 })();
