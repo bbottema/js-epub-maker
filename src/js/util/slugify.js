@@ -1,5 +1,7 @@
-/* global s, console */
+/* global module, s, console */
 (function() {
+    'use strict';
+    
     module.exports = (typeof(s) !== 'undefined' && s.slugify) ? s.slugify : simpleSlugify;
     
     if (module.exports === simpleSlugify) {

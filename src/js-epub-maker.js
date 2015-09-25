@@ -123,7 +123,7 @@
                 Array.prototype.push.apply(sections, collectSections(section.subSections[i], prop));
             }
             return sections;
-        };
+        }
     };
 
     // manage dependency exports

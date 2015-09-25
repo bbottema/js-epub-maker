@@ -1,4 +1,4 @@
-/* global module, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
+/* global module, require, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
 (function() {
     'use strict';
     
