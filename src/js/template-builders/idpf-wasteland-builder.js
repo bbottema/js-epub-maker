@@ -94,7 +94,9 @@
             
             function formatHTML(htmlstr) {
                 return (skipFormatting || typeof html_beautify === 'undefined') ? htmlstr : 
+                    /*jslint camelcase:true*/
                     html_beautify(htmlstr, {
+                    /*jslint camelcase:false*/
                         'end_with_newline': false,
                         'indent_char': '\t',
                         'indent_inner_html': true,
