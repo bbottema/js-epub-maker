@@ -110,19 +110,19 @@
         };
         
         this.collectToc = function() {
-            var toc = self.includeInToc ? [self] : [];
-            for (var i = 0; i < self.subSections.length; i++) {
-                Array.prototype.push.apply(toc, self.subSections[i].collectToc());
-            }
-            return toc;
+            return collectSections(this, 'includeInToc');
         };
         
         this.collectLandmarks = function() {
-            var landmarks = self.includeInLandmarks ? [self] : [];
-            for (var i = 0; i < self.subSections.length; i++) {
-                Array.prototype.push.apply(landmarks, self.subSections[i].collectLandmarks());
+            return collectSections(this, 'includeInLandmarks');
+        };
+        
+        function collectSections(section, prop) {
+            var sections = section[prop] ? [section] : [];
+            for (var i = 0; i < section.subSections.length; i++) {
+                Array.prototype.push.apply(sections, collectSections(section.subSections[i], prop));
             }
-            return landmarks;
+            return sections;
         };
     };
 
