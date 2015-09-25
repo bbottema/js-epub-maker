@@ -25,7 +25,7 @@
             
             var deferred = D();
             D.all(
-                addMimetype(zip, epubConfig),
+                addMimetype(zip),
                 addContainerInfo(zip, epubConfig),
                 addManifestOpf(zip, epubConfig),
                 addCover(zip, epubConfig),
@@ -40,7 +40,7 @@
             return deferred.promise;
         };
         
-        function addMimetype(zip, epubConfig) {
+        function addMimetype(zip) {
             zip.file('mimetype', templates.mimetype);
         }
         

@@ -1,4 +1,7 @@
+/* global module, require */
 (function() {
+   'use strict';
+   
    // source: http://www.idpf.org/epub/vocab/structure/epub-vocab-structure-20150826.html
    var epubtypes = [
       {
@@ -94,7 +97,7 @@
    ];
    
    var groups = {};
-   for (var i in epubtypes) {
+   for (var i = 0; i < epubtypes.length; i++) {
        var group = epubtypes[i].group;
        (groups[group] || (groups[group] = [])).push(epubtypes[i]);
    }
