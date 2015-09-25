@@ -118,11 +118,11 @@
         };
         
         this.collectLandmarks = function() {
-            var toc = self.includeInLandmarks ? [self] : [];
+            var landmarks = self.includeInLandmarks ? [self] : [];
             for (var i = 0; i < self.subSections.length; i++) {
-                Array.prototype.push.apply(toc, self.subSections[i].collectLandmarks());
+                Array.prototype.push.apply(landmarks, self.subSections[i].collectLandmarks());
             }
-            return toc;
+            return landmarks;
         };
     };
 
