@@ -85,7 +85,7 @@
         }
         
         function addContent(zip, epubConfig) {
-            Handlebars.registerPartial("sectionTemplate", templates.sectionsTemplate);
+            Handlebars.registerPartial('sectionTemplate', templates.sectionsTemplate);
             zip.folder('EPUB').file(epubConfig.slug + '-content.xhtml', compile(templates.content, epubConfig));
         }
         
@@ -96,11 +96,11 @@
                 return (skipFormatting || typeof html_beautify === 'undefined') ? htmlstr : 
                     html_beautify(htmlstr, {
                         end_with_newline: false,
-                        indent_char: "\t",
+                        indent_char: '\t',
                         indent_inner_html: true,
-                        indent_size: "1",
+                        indent_size: '1',
                         preserve_newlines: false,
-                        wrap_line_length: "0",
+                        wrap_line_length: '0',
                         unformatted: [],
                         selector_separator_newline: false,
                         newline_between_rules: true
