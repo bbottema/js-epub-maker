@@ -8,7 +8,7 @@
     require('./js/util/handlebar-helpers');
     
     var templateManagers = {
-        'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
+        'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder
     };
     
     var EpubMaker = function () {
@@ -73,7 +73,7 @@
             epubConfig.publicationDate = new Date().toISOString();
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
     			console.info('generating epub for: ' + epubConfig.title);
-    			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
+    			var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
     			return content;
             });
         };
@@ -88,7 +88,7 @@
     };
     
     // epubtypes and descriptions, useful for vendors implementing a GUI
-    EpubMaker.epubtypes = require("../src/js/epub-types.js");
+    EpubMaker.epubtypes = require('../src/js/epub-types.js');
     
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
