@@ -93,10 +93,9 @@
             return formatHTML(Handlebars.compile(template)(content));
             
             function formatHTML(htmlstr) {
+                /*jslint camelcase:false*/
                 return (skipFormatting || typeof html_beautify === 'undefined') ? htmlstr : 
-                    /*jslint camelcase:false*/
                     html_beautify(htmlstr, {
-                    /*jslint camelcase:true*/
                         'end_with_newline': false,
                         'indent_char': '\t',
                         'indent_inner_html': true,
@@ -107,6 +106,7 @@
                         'selector_separator_newline': false,
                         'newline_between_rules': true
                     });
+                /*jslint camelcase:true*/
             }
         }
     };

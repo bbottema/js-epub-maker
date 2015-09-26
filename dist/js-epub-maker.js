@@ -9,7 +9,7 @@
     require('./js/util/handlebar-helpers');
     
     var templateManagers = {
-        'idpf-wasteland': require("../src/js/template-builders/idpf-wasteland-builder.js").builder
+        'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder
     };
     
     var EpubMaker = function () {
@@ -74,7 +74,7 @@
             epubConfig.publicationDate = new Date().toISOString();
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
     			console.info('generating epub for: ' + epubConfig.title);
-    			var content = epubZip.generate({ type: "blob", mimeType: "application/epub+zip", compression: "DEFLATE" });
+    			var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
     			return content;
             });
         };
@@ -89,7 +89,7 @@
     };
     
     // epubtypes and descriptions, useful for vendors implementing a GUI
-    EpubMaker.epubtypes = require("../src/js/epub-types.js");
+    EpubMaker.epubtypes = require('../src/js/epub-types.js');
     
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
@@ -111,20 +111,20 @@
         };
         
         this.collectToc = function() {
-            var toc = self.includeInToc ? [self] : [];
-            for (var i = 0; i < self.subSections.length; i++) {
-                Array.prototype.push.apply(toc, self.subSections[i].collectToc());
-            }
-            return toc;
+            return collectSections(this, 'includeInToc');
         };
         
         this.collectLandmarks = function() {
-            var toc = self.includeInLandmarks ? [self] : [];
-            for (var i = 0; i < self.subSections.length; i++) {
-                Array.prototype.push.apply(toc, self.subSections[i].collectLandmarks());
-            }
-            return toc;
+            return collectSections(this, 'includeInLandmarks');
         };
+        
+        function collectSections(section, prop) {
+            var sections = section[prop] ? [section] : [];
+            for (var i = 0; i < section.subSections.length; i++) {
+                Array.prototype.push.apply(sections, collectSections(section.subSections[i], prop));
+            }
+            return sections;
+        }
     };
 
     // manage dependency exports
@@ -694,148 +694,123 @@ process.umask = function() { return 0; };
 
 }).call(this,require('_process'))
 },{"_process":2}],4:[function(require,module,exports){
+/* global module */
 (function() {
+   'use strict';
+   
    // source: http://www.idpf.org/epub/vocab/structure/epub-vocab-structure-20150826.html
    var epubtypes = [
       {
-         "name":"abstract",
-         "type":"ABSTRACT",
-         "group": "Front Matter",
-         "description":"A short summary of the principle ideas, concepts and conclusions of the work, or of a section or except within it."
+         'name':'abstract',
+         'group': 'Front Matter',
+         'description':'A short summary of the principle ideas, concepts and conclusions of the work, or of a section or except within it.'
       },
       {
-         "name":"foreword",
-         "type":"FOREWORD",
-         "group": "Front Matter",
-         "description":"An introductory section that precedes the work, typically not written by the work's author."
+         'name':'foreword',
+         'group': 'Front Matter',
+         'description':'An introductory section that precedes the work, typically not written by the work\'s author.'
       },
       {
-         "name":"preface",
-         "type":"PREFACE",
-         "group": "Front Matter",
-         "description":"An introductory section that precedes the work, typically written by the work's author."
+         'name':'preface',
+         'group': 'Front Matter',
+         'description':'An introductory section that precedes the work, typically written by the work\'s author.'
       },
       {
-         "name":"introduction",
-         "type":"INTRODUCTION",
-         "group": "Front Matter",
-         "description":"A section in the beginning of the work, typically introducing the reader to the scope or nature of the work's content."
+         'name':'introduction',
+         'group': 'Front Matter',
+         'description':'A section in the beginning of the work, typically introducing the reader to the scope or nature of the work\'s content.'
       },
       {
-         "name":"preamble",
-         "type":"PREAMBLE",
-         "group": "Front Matter",
-         "description":"A section in the beginning of the work, typically containing introductory and/or explanatory prose regarding the scope or nature of the work's content"
+         'name':'preamble',
+         'group': 'Front Matter',
+         'description':'A section in the beginning of the work, typically containing introductory and/or explanatory prose regarding the scope or nature of the work\'s content'
       },
       {
-         "name":"epigraph",
-         "type":"EPIGRAPH",
-         "group": "Front Matter",
-         "description":"A quotation that is pertinent but not integral to the text."
+         'name':'epigraph',
+         'group': 'Front Matter',
+         'description':'A quotation that is pertinent but not integral to the text.'
       },
       {
-         "name":"non-specific frontmatter",
-         "type":"FRONTMATTER-GENERIC",
-         "group": "Front Matter",
-         "description": "Content placed in the frontmatter section, but which has no specific semantic meaning."
+         'name':'non-specific frontmatter',
+         'group': 'Front Matter',
+         'description': 'Content placed in the frontmatter section, but which has no specific semantic meaning.'
       },
       {
-         "name":"part",
-         "type":"PART",
-         "group": "Body Matter",
-         "description":"An introductory section that sets the background to a story, typically part of the narrative."
+         'name':'part',
+         'group': 'Body Matter',
+         'description':'An introductory section that sets the background to a story, typically part of the narrative.'
       },
       {
-         "name":"chapter",
-         "type":"CHAPTER",
-         "group": "Body Matter",
-         "description":"An introductory section that sets the background to a story, typically part of the narrative."
+         'name':'chapter',
+         'group': 'Body Matter',
+         'description':'An introductory section that sets the background to a story, typically part of the narrative.'
       },
       {
-         "name":"prologue",
-         "type":"PROLOGUE",
-         "group": "Body Matter",
-         "description":"An introductory section that sets the background to a story, typically part of the narrative."
+         'name':'prologue',
+         'group': 'Body Matter',
+         'description':'An introductory section that sets the background to a story, typically part of the narrative.'
       },
       {
-         "name":"conclusion",
-         "type":"CONCLUSION",
-         "group": "Body Matter",
-         "description":"An ending section that typically wraps up the work."
+         'name':'conclusion',
+         'group': 'Body Matter',
+         'description':'An ending section that typically wraps up the work.'
       },
       {
-         "name":"epilogue",
-         "type":"EPILOGUE",
-         "group": "Body Matter",
-         "description":"A concluding section that is typically written from a later point in time than the main story, although still part of the narrative."
+         'name':'epilogue',
+         'group': 'Body Matter',
+         'description':'A concluding section that is typically written from a later point in time than the main story, although still part of the narrative.'
       },
       {
-         "name":"afterword",
-         "type":"AFTERWORD",
-         "group": "Back Matter",
-         "description":"A closing statement from the author or a person of importance to the story, typically providing insight into how the story came to be written, its significance or related events that have transpired since its timeline."
+         'name':'afterword',
+         'group': 'Back Matter',
+         'description':'A closing statement from the author or a person of importance to the story, typically providing insight into how the story came to be written, its significance or related events that have transpired since its timeline.'
       },
       {
-         "name":"non-specific backmatter",
-         "type":"BACKMATTER-GENERIC",
-         "group": "Back Matter",
-         "description": "Content placed in the backmatter section, but which has no specific semantic meaning."
+         'name':'non-specific backmatter',
+         'group': 'Back Matter',
+         'description': 'Content placed in the backmatter section, but which has no specific semantic meaning.'
       },
       {
-         "name":"rearnote",
-         "type":"REARNOTE",
-         "group": "Back Matter",
-         "description":"A note appearing in the rear (backmatter) of the work, or at the end of a section."
+         'name':'rearnote',
+         'group': 'Back Matter',
+         'description':'A note appearing in the rear (backmatter) of the work, or at the end of a section.'
       }
    ];
    
    var groups = {};
-   for (var i in epubtypes) {
+   for (var i = 0; i < epubtypes.length; i++) {
        var group = epubtypes[i].group;
        (groups[group] || (groups[group] = [])).push(epubtypes[i]);
    }
    
    function getGroup(epubtype) {
       return {
-         "ABSTRACT": "FRONTMATTER",
-         "FOREWORD": "FRONTMATTER",
-         "PREFACE": "FRONTMATTER",
-         "INTRODUCTION": "FRONTMATTER",
-         "PREAMBLE": "FRONTMATTER",
-         "EPIGRAPH": "FRONTMATTER",
-         "FRONTMATTER-GENERIC": "FRONTMATTER",
-         "PART": "BODYMATTER",
-         "CHAPTER": "BODYMATTER",
-         "PROLOGUE": "BODYMATTER",
-         "CONCLUSION": "BODYMATTER",
-         "EPILOGUE": "BODYMATTER",
-         "AFTERWORD": "BACKMATTER",
-         "BACKMATTER-GENERIC": "BACKMATTER",
-         "REARNOTE": "BACKMATTER"
+         'abstract': 'frontmatter',
+         'foreword': 'frontmatter',
+         'preface': 'frontmatter',
+         'introduction': 'frontmatter',
+         'preamble': 'frontmatter',
+         'epigraph': 'frontmatter',
+         'non-specific frontmatter': 'frontmatter',
+         'part': 'bodymatter',
+         'chapter': 'bodymatter',
+         'prologue': 'bodymatter',
+         'conclusion': 'bodymatter',
+         'epilogue': 'bodymatter',
+         'afterword': 'backmatter',
+         'non-specific backmatter': 'backmatter',
+         'rearnote': 'backmatter'
       }[epubtype];
-   }
-   
-   function getActualType(type) {
-      if (!type) {
-         return null;
-      }
-      for (var i = 0; i < epubtypes.length; i++) {
-         if (epubtypes[i].type === type) {
-            return epubtypes[i].name;
-         }
-      }
-      throw new Error('unknown epub type identifier: ' + type);
    }
    
    module.exports = { 
       types: epubtypes, 
       groups: groups,
-      getGroup: getGroup,
-      getActualType: getActualType
+      getGroup: getGroup
    };
 })();
 },{}],5:[function(require,module,exports){
-/* global module, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
+/* global module, require, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
 (function() {
     'use strict';
     
@@ -862,7 +837,7 @@ process.umask = function() { return 0; };
             
             var deferred = D();
             D.all(
-                addMimetype(zip, epubConfig),
+                addMimetype(zip),
                 addContainerInfo(zip, epubConfig),
                 addManifestOpf(zip, epubConfig),
                 addCover(zip, epubConfig),
@@ -877,7 +852,7 @@ process.umask = function() { return 0; };
             return deferred.promise;
         };
         
-        function addMimetype(zip, epubConfig) {
+        function addMimetype(zip) {
             zip.file('mimetype', templates.mimetype);
         }
         
@@ -922,7 +897,7 @@ process.umask = function() { return 0; };
         }
         
         function addContent(zip, epubConfig) {
-            Handlebars.registerPartial("sectionTemplate", templates.sectionsTemplate);
+            Handlebars.registerPartial('sectionTemplate', templates.sectionsTemplate);
             zip.folder('EPUB').file(epubConfig.slug + '-content.xhtml', compile(templates.content, epubConfig));
         }
         
@@ -930,18 +905,20 @@ process.umask = function() { return 0; };
             return formatHTML(Handlebars.compile(template)(content));
             
             function formatHTML(htmlstr) {
+                /*jslint camelcase:false*/
                 return (skipFormatting || typeof html_beautify === 'undefined') ? htmlstr : 
                     html_beautify(htmlstr, {
-                        end_with_newline: false,
-                        indent_char: "\t",
-                        indent_inner_html: true,
-                        indent_size: "1",
-                        preserve_newlines: false,
-                        wrap_line_length: "0",
-                        unformatted: [],
-                        selector_separator_newline: false,
-                        newline_between_rules: true
+                        'end_with_newline': false,
+                        'indent_char': '\t',
+                        'indent_inner_html': true,
+                        'indent_size': '1',
+                        'preserve_newlines': false,
+                        'wrap_line_length': '0',
+                        'unformatted': [],
+                        'selector_separator_newline': false,
+                        'newline_between_rules': true
                     });
+                /*jslint camelcase:true*/
             }
         }
     };
@@ -962,8 +939,10 @@ process.umask = function() { return 0; };
     }
 }());
 },{"../../js/util/console":6,"d.js":3}],6:[function(require,module,exports){
-/* global console */
+/* global module, console */
 (function() {
+    'use strict';
+    
     module.exports = function() { 
         return (typeof(console) !== 'undefined') ? console : 
             { log: f, info: f, debug: f, warn: f, error: f };
@@ -976,12 +955,12 @@ process.umask = function() { return 0; };
     'use strict';
     
     var mimetypes = {
-        "jpeg": "image/jpeg",
-        "jpg": "image/jpeg",
-        "bmp": "image/bmp",
-        "png": "image/png",
-        "svg": "image/svg+xml",
-        "gif": "image/gif"
+        'jpeg': 'image/jpeg',
+        'jpg': 'image/jpeg',
+        'bmp': 'image/bmp',
+        'png': 'image/png',
+        'svg': 'image/svg+xml',
+        'gif': 'image/gif'
     };
 
     Handlebars.registerHelper('extension', function(str) {
@@ -997,8 +976,10 @@ process.umask = function() { return 0; };
     }
 })();
 },{}],8:[function(require,module,exports){
-/* global s, console */
+/* global module, s, console */
 (function() {
+    'use strict';
+    
     module.exports = (typeof(s) !== 'undefined' && s.slugify) ? s.slugify : simpleSlugify;
     
     if (module.exports === simpleSlugify) {
