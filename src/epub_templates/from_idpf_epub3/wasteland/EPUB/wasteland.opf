@@ -30,7 +30,6 @@
         <item id="cover" href="{{slug}}-cover.{{extension coverUrl}}" media-type="{{mimetype coverUrl}}" properties="cover-image" />
         {{/if}}
         <item id="css" href="{{slug}}.css" media-type="text/css" />
-        <item id="css-night" href="{{slug}}-night.css" media-type="text/css" />
         <!-- ncx included for 2.0 reading system compatibility: -->
         <item id="ncx" href="{{slug}}.ncx" media-type="application/x-dtbncx+xml" />
     </manifest>

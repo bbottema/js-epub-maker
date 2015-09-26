@@ -5,8 +5,8 @@
 body {
     margin-left: 6em;
     margin-right: 2em;
-    color: black;    
-    font-family: times, 'times new roman', serif;    
+    color: black;
+    font-family: times, 'times new roman', serif;
     background-color: rgb(255,255,245);
     line-height: 1.5em;
 }
@@ -20,8 +20,8 @@ h3 {
     margin-top: 3em;
 }
 
-.linegroup { 
-    margin-top: 1.6em; 
+.linegroup {
+    margin-top: 1.6em;
 }
 
 span.lnum {
@@ -30,7 +30,7 @@ span.lnum {
     font-size : 90%;
 }
 
-a.noteref {    
+a.noteref {
     color: rgb(215,215,195);
     text-decoration: none;
     margin-left: 0.5em;
@@ -55,3 +55,5 @@ section#rearnotes a {
 *[epub|type~='dedication'] {
     padding-left: 2em;
 }
+
+{{{styles}}}

@@ -62,6 +62,11 @@
             return self;
         };
         
+        this.withStylesheetUrl = function(stylesheetUrl) {
+            epubConfig.stylesheetUrl = stylesheetUrl;
+            return self;
+        };
+        
         this.withSection = function(section) {
             epubConfig.sections.push(section);
             Array.prototype.push.apply(epubConfig.toc, section.collectToc());

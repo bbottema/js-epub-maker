@@ -4,6 +4,7 @@
     
     var D = require('d.js');
     var console = require('../../js/util/console')();
+    var ajax = require('../../js/util/ajax');
     
     var templates = {
         mimetype: '@@import src/epub_templates/from_idpf_epub3/wasteland/mimetype',
@@ -12,7 +13,6 @@
         ncx: '@@import src/epub_templates/from_idpf_epub3/wasteland//EPUB/wasteland.ncx',
         nav: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-nav.xhtml',
         css: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland.css',
-        cssNight: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-night.css',
         content: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/wasteland-content.xhtml',
         sectionsTemplate: '@@import src/epub_templates/from_idpf_epub3/wasteland/EPUB/sections-template.xhtml'
     };
@@ -53,22 +53,22 @@
         }
         
         function addCover(zip, epubConfig) {
-            var p = D();
+            var deferred = D();
             
             if (epubConfig.coverUrl) {
                 JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
                     if (!err) {
                         var ext = epubConfig.coverUrl.substr(epubConfig.coverUrl.lastIndexOf('.') + 1);
                         zip.folder('EPUB').file(epubConfig.slug + '-cover.' + ext, data, { binary: true });
-                        p.resolve('');
+                        deferred.resolve('');
                     } else {
-                        p.reject(err);
+                        deferred.reject(err);
                     }
                 });
             } else {
-                p.resolve('');
+                deferred.resolve(true);
             }
-            return p.promise;
+            return deferred.promise;
         }
         
         function addEpub2Nav(zip, epubConfig) {
@@ -80,8 +80,21 @@
         }
         
         function addStylesheets(zip, epubConfig) {
-            zip.folder('EPUB').file(epubConfig.slug + '.css', compile(templates.css, epubConfig, true));
-            zip.folder('EPUB').file(epubConfig.slug + '-night.css', compile(templates.cssNight, epubConfig, true));
+            var deferred = D();
+            if (epubConfig.stylesheetUrl) {
+                return ajax(epubConfig.stylesheetUrl).then(function(result) {
+                    epubConfig.styles = result.data;
+                    compileAndAddCss();
+                });
+            } else {
+                compileAndAddCss();
+            }
+            return deferred.promise;
+            
+            function compileAndAddCss() {
+                zip.folder('EPUB').file(epubConfig.slug + '.css', compile(templates.css, epubConfig, true));
+                deferred.resolve(true);
+            }
         }
         
         function addContent(zip, epubConfig) {
