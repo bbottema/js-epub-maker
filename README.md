@@ -2,7 +2,7 @@
 
 # js-epub-maker
 
-`js-epub-maker` will allow you to create and download epubs. It offers an API through which you can set meta info, navigation and content. `js-epub-maker` works by gutting [IDPF's sample epub](http://idpf.github.io/epub3-samples/) and refitting it with your content. The source epub this project is working with is [The Waste Land](http://idpf.github.io/epub3-samples/samples.html#wasteland) ([source code](https://github.com/IDPF/epub3-samples/tree/master/30/wasteland)).
+`js-epub-maker` allows you to create and download epubs. It offers an API through which you can set meta info, navigation and content. `js-epub-maker` works by gutting [IDPF's sample epub](http://idpf.github.io/epub3-samples/) and refitting it with your content. The source epub this project is working with is [The Waste Land](http://idpf.github.io/epub3-samples/samples.html#wasteland) ([source code](https://github.com/IDPF/epub3-samples/tree/master/30/wasteland)).
 
 [DEMO](https://jsfiddle.net/plantface/4z50uv7p/)
 
@@ -52,7 +52,7 @@ new EpubMaker()
 
 ## Sections
 
-There is some API to set all the meta-data, but the magic in the way you can add *sections*. With sections you can add either all content with just one section, or finetune all the content so that it snugly fits the epub spec (with the various epub types described in the spec) and more importantly allows you to indicate exactly what should be included in the TOC and Landmarks section of the epub. You don't need to take care of all that, `js-epub-maker` will do that for you.
+There is some API to set all the meta-data, but the magic in the way you can add *sections*. With sections you can add either all content with just one section, or finetune all the content so that it snugly fits the epub spec (with the various epub types described in the spec) and more importantly allows you to indicate exactly what should be included in the TOC and Landmarks section of the epub. You don't need to take care of all that, _js-epub-maker_ will do that for you.
 
 ```javascript
 /**
