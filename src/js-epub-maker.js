@@ -109,10 +109,13 @@
         this.epubType = epubType;
         this.id = id;
         this.content = content;
-        content.renderTitle = content.renderTitle !== false; // 'undefined' should default to true
         this.includeInToc = includeInToc;
         this.includeInLandmarks = includeInLandmarks;
         this.subSections = [];
+        
+        if (content) {
+            content.renderTitle = content.renderTitle !== false; // 'undefined' should default to true
+        }
         
         this.withSubSection = function(subsection) {
             self.subSections.push(subsection);
