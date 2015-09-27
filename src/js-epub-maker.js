@@ -13,7 +13,7 @@
     
     var EpubMaker = function () {
         var self = this;
-        var epubConfig = { toc: [], landmarks: [], sections: [] };
+        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {} };
         
         this.withUuid = function(uuid) {
             epubConfig.uuid = uuid;
@@ -62,8 +62,12 @@
             return self;
         };
         
-        this.withStylesheetUrl = function(stylesheetUrl) {
-            epubConfig.stylesheetUrl = stylesheetUrl;
+        this.withStylesheetUrl = function(stylesheetUrl, replaceOriginal) {
+            epubConfig.stylesheet = {
+                url: stylesheetUrl,
+                styles: '',
+                replaceOriginal: replaceOriginal
+            };
             return self;
         };
         

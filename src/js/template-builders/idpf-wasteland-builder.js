@@ -81,8 +81,8 @@
         
         function addStylesheets(zip, epubConfig) {
             var deferred = D();
-            if (epubConfig.stylesheetUrl) {
-                return ajax(epubConfig.stylesheetUrl).then(function(result) {
+            if (epubConfig.stylesheet.url) {
+                return ajax(epubConfig.stylesheet.url).then(function(result) {
                     epubConfig.styles = result.data;
                     compileAndAddCss();
                 });
@@ -92,7 +92,11 @@
             return deferred.promise;
             
             function compileAndAddCss() {
-                zip.folder('EPUB').file(epubConfig.slug + '.css', compile(templates.css, epubConfig, true));
+                var styles = {
+                    original: epubConfig.stylesheet.replaceOriginal ? '' : templates.css,
+                    custom: epubConfig.styles
+                };
+                zip.folder('EPUB').file(epubConfig.slug + '.css', compile('{{{original}}}{{{custom}}}', styles, true));
                 deferred.resolve(true);
             }
         }

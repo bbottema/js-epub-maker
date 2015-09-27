@@ -29,7 +29,7 @@ function createTestEpub(header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
         	license: 'http://creativecommons.org/licenses/by-sa/3.0/'
         })
         .withAttributionUrl('https://github.com/bbottema/js-epub-maker')
-        .withStylesheetUrl('src/test/content-for-epub/extra_styles.css')
+        .withStylesheetUrl('src/test/content-for-epub/extra_styles.css', false)
         .withCover('src/test/content-for-epub/js-epub-maker-cover.jpg', {
         	license: 'http://creativecommons.org/licenses/by-sa/3.0/',
         	attributionUrl: 'http://www.webestools.com/web20-title-generator-logo-title-maker-online-web20-effect-reflect-free-photoshop.html'
