@@ -103,13 +103,14 @@
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
      * @id Optional, but required if section should be included in toc and / or landmarks
-     * @content Optional. Should not be empty if there will be no subsections added to this section
+     * @content Optional. Should not be empty if there will be no subsections added to this section. Format: { title, content, renderTitle }
      */
     EpubMaker.Section = function(epubType, id, content, includeInToc, includeInLandmarks) {
         var self = this;
         this.epubType = epubType;
         this.id = id;
         this.content = content;
+        content.renderTitle = content.renderTitle !== false; // 'undefined' should default to true
         this.includeInToc = includeInToc;
         this.includeInLandmarks = includeInLandmarks;
         this.subSections = [];
@@ -835,7 +836,7 @@ process.umask = function() { return 0; };
         nav: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"\n	xmlns:epub="http://www.idpf.org/2007/ops">\n	<head>\n		<meta charset="utf-8"></meta>		\n		<link rel="stylesheet" type="text/css" href="{{slug}}.css" class="day" title="day"/> \n	</head>\n	<body>\n		<nav epub:type="toc" id="toc">\n			<ol>\n				{{#each toc}}\n				<li><a href="{{../slug}}-content.xhtml#{{id}}">{{content.title}}</a></li>\n				{{/each}}\n			</ol>			\n		</nav>\n		<nav epub:type="landmarks">\n			<ol>\n				{{#each landmarks}}\n				<li><a epub:type="{{epubType}}" href="{{../slug}}-content.xhtml#{{id}}">{{#if content.title}}{{content.title}}{{else}}{{epubType}}{{/if}}</a></li>\n				{{/each}}\n			</ol>\n		</nav>\n	</body>\n</html>\n',
         css: '@charset "UTF-8";\n@namespace "http://www.w3.org/1999/xhtml";\n@namespace epub "http://www.idpf.org/2007/ops";\n\nbody {\n    margin-left: 6em;\n    margin-right: 2em;\n    color: black;\n    font-family: times, \'times new roman\', serif;\n    background-color: rgb(255,255,245);\n    line-height: 1.5em;\n}\n\nh2 {\n    margin-top: 5em;\n    margin-bottom: 2em;\n}\n\nh3 {\n    margin-top: 3em;\n}\n\n.linegroup {\n    margin-top: 1.6em;\n}\n\nspan.lnum {\n    float: right;\n    color: gray;\n    font-size : 90%;\n}\n\na.noteref {\n    color: rgb(215,215,195);\n    text-decoration: none;\n    margin-left: 0.5em;\n    margin-right: 0.5em;\n}\n\nsection#rearnotes a {\n    color: black;\n    text-decoration: none;\n    border-bottom : 1px dotted gray;\n    margin-right: 0.8em;\n}\n\n.indent {\n    padding-left: 3em;\n}\n\n.indent2 {\n    padding-left: 5em;\n}\n\n*[epub|type~=\'dedication\'] {\n    padding-left: 2em;\n}\n',
         content: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:epub="http://www.idpf.org/2007/ops">\n	<head>\n		<meta charset="utf-8"></meta>\n		<title>{{title}}</title>\n		<link rel="stylesheet" type="text/css" href="{{slug}}.css" class="day" title="day"/> \n	</head>\n	<body>\n		{{#each sections}}{{> sectionTemplate}}{{/each}}\n	</body>\n</html>\n',
-        sectionsTemplate: '{{!-- strange if-construction, but this is a workaround for gulp-js-html-inject, whose minifier wreaks havoc otherwise --}}\n{{#if epubType}}<section epub:type="{{epubType}}" id="{{id}}">{{else}}<section id="{{id}}">{{/if}}\n\n    {{#if content.title}}<h2>{{content.title}}</h2>{{/if}} \n    {{#if content.content}}{{{content.content}}}{{/if}}\n    \n    {{#each subSections}} {{> sectionTemplate}} {{/each}}\n    \n{{#if epubType}}</section>{{else}}</section>{{/if}}'
+        sectionsTemplate: '{{!-- strange if-construction, but this is a workaround for gulp-js-html-inject, whose minifier wreaks havoc otherwise --}}\n{{#if epubType}}<section epub:type="{{epubType}}" id="{{id}}">{{else}}<section id="{{id}}">{{/if}}\n\n    {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/renderTitle}} \n    {{#if content.content}}{{{content.content}}}{{/if}}\n    \n    {{#each subSections}} {{> sectionTemplate}} {{/each}}\n    \n{{#if epubType}}</section>{{else}}</section>{{/if}}'
     };
     
     var Builder = function() {
