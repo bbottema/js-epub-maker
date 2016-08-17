@@ -53,7 +53,7 @@ new EpubMaker()
 
 ## Sections
 
-There is some API to set all the meta-data, but the magic in the way you can add *sections*. With sections you can add either all content with just one section, or finetune all the content so that it snugly fits the epub spec (with the various epub types described in the spec) and more importantly allows you to indicate exactly what should be included in the TOC and Landmarks section of the epub. You don't need to take care of all that, _js-epub-maker_ will do that for you.
+There is some API to set all the meta-data, but the magic is in the way you can add *sections*. With sections you can add either all content with just one section, or finetune all the content so that it snugly fits the epub spec (with the various epub types described in the spec) and more importantly allows you to indicate exactly what should be included in the TOC and Landmarks section of the epub. You don't need to take care of all that, _js-epub-maker_ will do that for you.
 
 ```javascript
 /**
