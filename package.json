@@ -1,7 +1,7 @@
 {
   "name": "epub-maker",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Easily create downloadable epub files with javascript",
   "main": "epub-maker.min.js",
   "scripts": {
     "test": "gulp test"
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/bbottema/epub-maker",
   "devDependencies": {
+    "browser-sync": "^2.18.11",
     "del": "^1.2.0",
     "lazypipe": "~0.2.3",
     "browserify": "10.2.3",
