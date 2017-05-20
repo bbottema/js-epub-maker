@@ -2,67 +2,67 @@
 /* global require, module, exports, saveAs */
 (function() {
     'use strict';
-    
+
     var console = require('./js/util/console')();
     var slugify = require('./js/util/slugify');
-    
+
     require('./js/util/handlebar-helpers');
-    
+
     var templateManagers = {
         'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder
     };
-    
+
     var EpubMaker = function () {
         var self = this;
         var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {} };
-        
+
         this.withUuid = function(uuid) {
             epubConfig.uuid = uuid;
             return self;
         };
-        
+
         this.withTemplate = function(templateName) {
             epubConfig.templateName = templateName;
             return self;
         };
-        
+
         this.withTitle = function(title) {
             epubConfig.title = title;
             epubConfig.slug = slugify(title);
             return self;
         };
-        
+
         this.withLanguage = function(lang) {
             epubConfig.lang = lang;
             return self;
         };
-        
+
         this.withAuthor = function(fullName) {
             epubConfig.author = fullName;
             return self;
         };
-        
+
         this.withModificationDate = function(modificationDate) {
             epubConfig.modificationDate = modificationDate.toISOString();
             return self;
         };
-        
+
         this.withRights = function(rightsConfig) {
             epubConfig.rights = rightsConfig;
             return self;
         };
-        
+
         this.withCover = function(coverUrl, rightsConfig) {
             epubConfig.coverUrl = coverUrl;
             epubConfig.coverRights = rightsConfig;
             return self;
         };
-        
+
         this.withAttributionUrl = function(attributionUrl) {
             epubConfig.attributionUrl = attributionUrl;
             return self;
         };
-        
+
         this.withStylesheetUrl = function(stylesheetUrl, replaceOriginal) {
             epubConfig.stylesheet = {
                 url: stylesheetUrl,
@@ -71,14 +71,14 @@
             };
             return self;
         };
-        
+
         this.withSection = function(section) {
             epubConfig.sections.push(section);
             Array.prototype.push.apply(epubConfig.toc, section.collectToc());
             Array.prototype.push.apply(epubConfig.landmarks, section.collectLandmarks());
             return self;
         };
-        
+
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
@@ -87,19 +87,22 @@
     			return content;
             });
         };
-        
-        this.downloadEpub = function() {
+
+        this.downloadEpub = function(callback) {
             self.makeEpub().then(function(epubZipContent) {
     			var filename = epubConfig.slug + '.epub';
     			console.debug('saving "' + filename + '"...');
+                if (callback && typeof(callback) === 'function') {
+                    callback(epubZipContent, filename);
+                }
     			saveAs(epubZipContent, filename);
             });
         };
     };
-    
+
     // epubtypes and descriptions, useful for vendors implementing a GUI
     EpubMaker.epubtypes = require('../src/js/epub-types.js');
-    
+
     /**
      * @epubType Optional. Allows you to add specific epub type content such as [epub:type="titlepage"]
      * @id Optional, but required if section should be included in toc and / or landmarks
@@ -113,24 +116,24 @@
         this.includeInToc = includeInToc;
         this.includeInLandmarks = includeInLandmarks;
         this.subSections = [];
-        
+
         if (content) {
             content.renderTitle = content.renderTitle !== false; // 'undefined' should default to true
         }
-        
+
         this.withSubSection = function(subsection) {
             self.subSections.push(subsection);
             return self;
         };
-        
+
         this.collectToc = function() {
             return collectSections(this, 'includeInToc');
         };
-        
+
         this.collectLandmarks = function() {
             return collectSections(this, 'includeInLandmarks');
         };
-        
+
         function collectSections(section, prop) {
             var sections = section[prop] ? [section] : [];
             for (var i = 0; i < section.subSections.length; i++) {
@@ -156,99 +159,6 @@
     }
 }());
 },{"../src/js/epub-types.js":4,"../src/js/template-builders/idpf-wasteland-builder.js":5,"./js/util/console":7,"./js/util/handlebar-helpers":8,"./js/util/slugify":9}],2:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],3:[function(require,module,exports){
 (function (process){
 /**
 * attempt of a simple defer/promise library for mobile development
@@ -706,7 +616,193 @@ process.umask = function() { return 0; };
 })();
 
 }).call(this,require('_process'))
-},{"_process":2}],4:[function(require,module,exports){
+},{"_process":3}],3:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],4:[function(require,module,exports){
 /* global module */
 (function() {
    'use strict';
@@ -968,7 +1064,7 @@ process.umask = function() { return 0; };
         window.epubMaker = new Builder();
     }
 }());
-},{"../../js/util/ajax":6,"../../js/util/console":7,"d.js":3}],6:[function(require,module,exports){
+},{"../../js/util/ajax":6,"../../js/util/console":7,"d.js":2}],6:[function(require,module,exports){
 /* global module, ActiveXObject */
 (function() {
     'use strict';
@@ -994,7 +1090,7 @@ process.umask = function() { return 0; };
     	return deferred.promise;
     };
 }());
-},{"../../js/util/console":7,"d.js":3}],7:[function(require,module,exports){
+},{"../../js/util/console":7,"d.js":2}],7:[function(require,module,exports){
 /* global module, console */
 (function() {
     'use strict';
