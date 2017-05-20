@@ -1,7 +1,8 @@
 /* global EpubMaker */
 'use strict';
 
-window.runTest = function() {
+function downloadTestEpub(event){
+    event.preventDefault();
     var epubMaker = createTestEpub(
         { content: document.getElementById('header-template').innerHTML },
         { content: document.getElementById('preface-template').innerHTML, title: 'Preface' },
@@ -12,8 +13,12 @@ window.runTest = function() {
         { content: document.getElementById('rearnotes1-template').innerHTML, title: 'Note 1' },
         { content: document.getElementById('rearnotes2-template').innerHTML, title: 'Note 2' }
     );
-    epubMaker.downloadEpub();
-};
+    epubMaker.downloadEpub(function(epubZipContent, filename){
+        epubMakerBtn.href = URL.createObjectURL(epubZipContent);
+        epubMakerBtn.download = filename;
+        epubMakerBtn.removeEventListener('click', downloadTestEpub);
+    });
+}
 
 function createTestEpub(header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
     return new EpubMaker()
@@ -53,3 +58,6 @@ function createTestEpub(header, preface, ch1, ch2, ch3, ch4, rn1, rn2) {
             )
         );
 }
+
+var epubMakerBtn = document.querySelector('#epubMakerBtn');
+epubMakerBtn.addEventListener('click', downloadTestEpub);
