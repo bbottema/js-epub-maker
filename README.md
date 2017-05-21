@@ -1,14 +1,16 @@
-[![MIT License][license-image]][license-url] [![Build Status][travis-image]][travis-url] [![Code Climate][codeclimate-gpa-image]][codeclimate-url] [![Codacy Badge][codacy-shields-image]][codacy-url]
-
 # js-epub-maker
+
+[![MIT License][license-image]][license-url] [![Build Status][travis-image]][travis-url] [![Code Climate][codeclimate-gpa-image]][codeclimate-url] [![Codacy Badge][codacy-shields-image]][codacy-url]
 
 `js-epub-maker` allows you to create and download epubs. It offers an API through which you can set meta info, navigation and content. `js-epub-maker` works by gutting [IDPF's sample epub](http://idpf.github.io/epub3-samples/) and refitting it with your content. The source epub this project is working with is [The Waste Land](http://idpf.github.io/epub3-samples/samples.html#wasteland) ([source code](https://github.com/IDPF/epub3-samples/tree/master/30/wasteland)).
 
 [Demo in jsfiddle](https://jsfiddle.net/plantface/4z50uv7p/)
 
-To run the demo yourself:
+## Installing
 
-`gulp demo`
+```bash
+npm install epub-maker --save
+```
 
 ## API: Sections
 
@@ -37,14 +39,14 @@ new EpubMaker()
     .withLanguage('en-GB')
     .withModificationDate(new Date(2015, 8, 7))
     .withRights({
-    	description: 'This work is shared with the public using the Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0) license.',
-    	license: 'http://creativecommons.org/licenses/by-sa/3.0/'
+        description: 'This work is shared with the public using the Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0) license.',
+        license: 'http://creativecommons.org/licenses/by-sa/3.0/'
     })
     .withAttributionUrl('https://github.com/bbottema/js-epub-maker')
     .withStylesheetUrl('src/test/content-for-epub/extra_styles.css')
     .withCover('src/test/content-for-epub/js-epub-maker-cover.jpg', {
-    	license: 'http://creativecommons.org/licenses/by-sa/3.0/',
-    	attributionUrl: 'http://www.webestools.com/web20-title-generator-logo-title-maker-online-web20-effect-reflect-free-photoshop.html'
+        license: 'http://creativecommons.org/licenses/by-sa/3.0/',
+        attributionUrl: 'http://www.webestools.com/web20-title-generator-logo-title-maker-online-web20-effect-reflect-free-photoshop.html'
     })
     .withTitle('It Came From... [Example Using Waste Land Template]')
     .withSection(new EpubMaker.Section('frontmatter', 'frontmatter', { title: 'Title page' }, false, true)
@@ -68,6 +70,25 @@ new EpubMaker()
         )
     )
     .downloadEpub();
+```
+
+## Running demo locally
+
+To run the demo yourself:
+
+```bash
+gulp demo
+```
+
+## Building js-epub-maker
+
+```bash
+npm install
+npm install -g bower
+npm install -g gulp
+bower install
+
+gulp clean build
 ```
 
 [license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
