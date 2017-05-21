@@ -71,7 +71,7 @@ gulp.task('travis', ['build'], function() {
         //.pipe($.coveralls());
 });
 
-gulp.task('demo', function() {
+gulp.task('demo', ['dist'], function() {
     browserSync.init({
         server: {
             baseDir: './demo',
