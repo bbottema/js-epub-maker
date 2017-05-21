@@ -76,7 +76,9 @@ new EpubMaker()
 
 To run the demo yourself:
 
-`gulp dist demo`
+```bash
+gulp demo
+```
 
 ## Building js-epub-maker
 
