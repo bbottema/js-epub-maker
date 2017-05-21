@@ -6,9 +6,9 @@
 
 [Demo in jsfiddle](https://jsfiddle.net/plantface/4z50uv7p/)
 
-To run the demo yourself:
+## Installing
 
-`gulp dist demo`
+`npm install epub-maker --save`
 
 ## API: Sections
 
@@ -68,6 +68,22 @@ new EpubMaker()
         )
     )
     .downloadEpub();
+```
+
+## Running demo locally
+
+To run the demo yourself:
+
+`gulp dist demo`
+
+## Building js-epub-maker
+
+```
+npm install
+npm install -g bower
+npm install -g gulp
+
+glulp clean build
 ```
 
 [license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
