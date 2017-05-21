@@ -35,7 +35,7 @@
     "gulp-coverage": "~0.3.35",
     "gulp-coveralls": "~0.1.4",
     "gulp-jasmine": "~2.0.1",
-    "gulp-js-text-inject": "1.0.0",
+    "gulp-js-text-inject": "1.0.1",
     "gulp-jshint": "1.11.0",
     "gulp-load-plugins": "0.10.0",
     "gulp-plumber": "1.0.1",
