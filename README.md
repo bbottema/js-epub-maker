@@ -82,8 +82,9 @@ To run the demo yourself:
 npm install
 npm install -g bower
 npm install -g gulp
+bower install
 
-glulp clean build
+gulp clean build
 ```
 
 [license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
