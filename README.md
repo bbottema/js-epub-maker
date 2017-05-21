@@ -8,7 +8,7 @@
 
 To run the demo yourself:
 
-`gulp dist demo`
+`gulp demo`
 
 ## API: Sections
 
