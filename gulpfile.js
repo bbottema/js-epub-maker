@@ -4,6 +4,7 @@ var lazypipe = require('lazypipe');
 var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
 var source = require('vinyl-source-stream');
+var browserSync = require('browser-sync').create();
 
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
@@ -68,6 +69,19 @@ gulp.task('travis', ['build'], function() {
         .pipe(testAndGather())
         .pipe($.coverage.format(['lcov']))
         //.pipe($.coveralls());
+});
+
+gulp.task('demo', function() {
+    browserSync.init({
+        server: {
+            baseDir: './demo',
+            routes: {
+                '/dist': 'dist'
+            }
+        }
+    });
+
+    gulp.watch('./demo/**/*').on('change', browserSync.reload);
 });
 
 gulp.task('report', ['clean', 'test'], function() {

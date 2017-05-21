@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>js-epub-maker demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <h1>js-epub-maker demo</h1>
+
+    <a href="#" id="epubMakerBtn" class="myButton">Download EPUB</a>
+
+    <hr/>
+
+    <p>All the custom content has been defined in template <i>&lt;script&gt;</i> tags.</p>
+
+    <p>The content is minified using <a href="https://kangax.github.io/html-minifier/">HTML Minifier</a> to demonstrate that
+        the resulting EPUB can be produced with nicely formatted contents (technically that is, readers don't see a difference)</p>
+
+    <hr/>
+
+    <h2>3rd Party libraries explained</h2>
+
+    <div class="CSSTableGenerator">
+        <table>
+            <tr>
+                <td> library </td>
+                <td> optional </td>
+                <td> what is it used for </td>
+            </tr>
+            <tr>
+                <td> js-epub-maker.js </td>
+                <td> required </td>
+                <td> Core library that uses all other libraries to produce a custom EPUB file </td>
+            </tr>
+            <tr>
+                <td> handlebars.min.js </td>
+                <td> required </td>
+                <td> Used to blend in the provided content sources into the EPUB resources </td>
+            </tr>
+            <tr>
+                <td> jszip.min.js </td>
+                <td> required </td>
+                <td> used to create the physical EPUB file, which is actually a zip file with a modified mimetype </td>
+            </tr>
+            <tr>
+                <td> jszip-utils.min.js </td>
+                <td> required for custom cover image </td>
+                <td> This util is used to GET image data properly as base64 </td>
+            </tr>
+            <tr>
+                <td> FileSaver.min.js </td>
+                <td> required for download EPUB function </td>
+                <td> Allows the browser to download an in memory datasource as file using 'Save as...' dialog </td>
+            </tr>
+            <tr>
+                <td> underscore.string.min.js </td>
+                <td> optional </td>
+                <td> If supplied, will use the more advanced <a href="https://github.com/epeli/underscore.string#slugifystring--string">slugify</a>                    function from underscore.string. </td>
+            </tr>
+            <tr>
+                <td> beautify-html.js </td>
+                <td> optional </td>
+                <td> If supplied, formats all HTML and XML files in the produced EPUB. Only useful for close inspection purposes,
+                    EPUB readers won't know the difference. </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <!-- we're creating an EPUB with the following content: -->
+
+
+    <script id="header-template" type="text/template">
+        <h1>It Came From</h1>
+        <div class="aut">It is I</div>
+        <div epub:type="epigraph">
+            <p>The future has a way of arriving unannounced. <br/>- George Will </p>
+        </div>
+        <p epub:type="dedication">For Shmokey McPokey</p>
+    </script>
+
+    <script id="preface-template" type="text/template">
+        <p> This Epub was generated from javascript, using <a href="https://github.com/bbottema/js-epub-maker">https://github.com/bbottema/js-epub-maker</a>            </p>
+        <p> This was done by taking the <a href="http://idpf.github.io/epub3-samples/samples.html#wasteland">IDPF Waste Land epub3 sample</a>,
+            gutting it and making the content dynamic. </p>
+        <p> The rest of this epub is generated content using various Lorum Ipsum generator variations, to demonstrate the configuration
+            for adding sections and nested sections to achieve proper epub(type) nesting (front matter, body matter, chapters,
+            notes etc. etc.). </p>
+    </script>
+
+    <script id="chapter1-template" type="text/template">
+        <div class="linegroup">
+            <div>Sem malesuada eleifend odio risus.</div>
+            <div>Quis interdum quam diam. Amet, eros in cursus.</div>
+            <div>Et viverra aptent.</div>
+            <div>Scelerisque pretium ut sem pede consectetuer tortor.</div>
+            <div>Convallis dolor parturient tempus non condimentum mattis.</div>
+            <div>Hymenaeos congue ligula quam aliquet porta lorem, cursus tellus.</div>
+        </div>
+        <div class="linegroup">
+            <div>Bibendum integer quam at congue.</div>
+            <div>Vivamus elementum sodales molestie magna Rhoncus. Sed lobortis tempus. Per adipiscing at facilisis praesent consectetuer.</div>
+            <div>Ipsum dapibus, amet dolor.</div>
+            <div>Pellentesque blandit eget. Tortor mattis senectus.</div>
+            <div>Et interdum purus. Primis montes sodales quis praesent. Elementum.</div>
+            <div>Nascetur augue metus donec condimentum felis molestie.</div>
+            <div>Mi mollis vivamus.</div>
+            <div>Fusce convallis lacus tortor a. Massa aliquam.</div>
+            <div>Id elit bibendum. Pharetra congue.</div>
+            <div>Turpis sociis cubilia elit ad curae; est, consectetuer.</div>
+        </div>
+    </script>
+
+    <script id="chapter2-template" type="text/template">
+        <div class="linegroup">
+            <div>Urna lacus viverra fringilla.</div>
+            <div>Pellentesque bibendum dolor quisque eget aliquam feugiat.</div>
+            <div>Natoque consectetuer proin.</div>
+            <div>Quam justo rutrum malesuada. Litora dui nisi convallis lobortis.</div>
+            <div>Cras pulvinar nonummy egestas donec netus. Rhoncus.</div>
+            <div>Class interdum, gravida sem orci venenatis molestie. Vestibulum.</div>
+            <div>Consectetuer, tortor, dapibus curae; torquent vel. Vulputate sociis curae;.</div>
+            <div>Fringilla. Cursus aenean ultricies quis dis commodo.</div>
+        </div>
+        <div class="linegroup">
+            <div>Scelerisque mus congue libero litora aliquam.</div>
+            <div>Pulvinar tristique adipiscing tellus sem, sem scelerisque nisi vestibulum.</div>
+            <div>Phasellus feugiat a.</div>
+            <div>Sodales curae; natoque. Habitant etiam in est praesent. Dui.</div>
+            <div>Proin suscipit mauris lorem. Elementum. Integer imperdiet. Sem.</div>
+            <div>Scelerisque vehicula volutpat.</div>
+        </div>
+    </script>
+
+    <script id="chapter3-template" type="text/template">
+        <div class="linegroup">
+            <div>Tree unto he winged she&#39;d own, fruit he.</div>
+            <div>From replenish rule saw. Made.</div>
+            <div>Said saying given spirit creature man, she&#39;d.</div>
+            <div>Greater without may face it saying. Creature years.</div>
+            <div>Saw Void there multiply greater blessed don&#39;t signs.</div>
+            <div>Brought blessed fly give.</div>
+            <div>Cattle replenish their be have.</div>
+            <div>He subdue his our. Green forth.</div>
+            <div>Without their forth fly.</div>
+            <div>Itself waters beginning waters in isn&#39;t i all sixth.</div>
+            <div>Midst thing kind evening their. God their living.</div>
+            <div>Third face living open he Together. Air.</div>
+            <div>Thing together fourth Life first.</div>
+            <div>Appear light own from him multiply.</div>
+            <div>Cattle herb green their living created god that.</div>
+        </div>
+    </script>
+
+    <script id="chapter4-template" type="text/template">
+        <div class="linegroup">
+            <div>Form kind third day yielding over.</div>
+            <div>Doesn&#39;t can&#39;t beginning saw hath.</div>
+            <div>Good fifth light land day itself gathered first land.</div>
+            <div>Were unto darkness may were his.</div>
+            <div>Cattle own lights upon.</div>
+            <div>From created second after.</div>
+            <div>There whose moved us him from fill he of fifth.</div>
+            <div>Face man. Lights, moved us they&#39;re female also he.</div>
+            <div>Brought. She&#39;d. One have midst abundantly good.</div>
+            <div>Created subdue. Years doesn&#39;t. Lesser can&#39;t doesn&#39;t fowl.</div>
+            <div>Made second fourth fruit moving, form years.</div>
+            <div>Male signs winged without fly replenish. Seed.</div>
+            <div>Said Face fifth don&#39;t open don&#39;t moving.</div>
+            <div>Given. Moveth sixth, moving void hath to.</div>
+            <div>Above. Be creeping shall were Was.</div>
+        </div>
+    </script>
+
+    <script id="rearnotes1-template" type="text/template">
+        Lorizzle get down get down dolor shit fizzle, shizzlin dizzle ghetto ma nizzle. Own yo' sapien dizzle, my shizz volutpat,
+        cool quizzle, crunk vizzle, fo shizzle. Pellentesque eget brizzle. Break it down eros. Cool izzle rizzle get down
+        get down turpis tempizzle nizzle. Maurizzle pellentesque nibh et turpizzle. Shiznit izzle tortizzle. Pellentesque
+        eleifend rhoncus dang. In bow wow wow habitasse platea dictumst. Donec dapibizzle. Curabitizzle tellizzle tellivizzle,
+        pretizzle fizzle, mattizzle we gonna chung, bling bling vitae, nunc. Bizzle izzle. Integizzle semper tellivizzle
+        sizzle purizzle.
+    </script>
+
+    <script id="rearnotes2-template" type="text/template">
+        Candy canes icing gummi bears sugar plum. Macaroon jelly beans ice cream gingerbread chupa chups gingerbread chocolate cake
+        jujubes chocolate. Topping cake cheesecake croissant cupcake gummies chupa chups. Gummi bears caramels lemon drops.
+        Tart tiramisu wafer bear claw fruitcake toffee marzipan cupcake. Cookie cake jelly beans chupa chups jelly beans
+        chocolate cake pastry.
+    </script>
+
+
+    <script src="js/vendor/jszip.min.js"></script>
+    <script src="js/vendor/jszip-utils.min.js"></script>
+    <script src="js/vendor/FileSaver.min.js"></script>
+    <script src="js/vendor/handlebars.min.js"></script>
+    <script src="js/vendor/underscore.string.min.js"></script>
+    <script src="js/vendor/beautify-html.js"></script>
+    <script src="../dist/js-epub-maker.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>
