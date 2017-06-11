@@ -91,7 +91,7 @@
         this.withOption = function(key, value) {
             epubConfig.options[key] = value;
             return self;
-        }
+        };
 
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
