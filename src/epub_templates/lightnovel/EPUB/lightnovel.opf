@@ -25,7 +25,7 @@
     </metadata>
     <manifest>
         {{#each sections}}{{> sectionsOPFManifestTemplate}}{{/each}}
-        <item id="nav" href="nav.html" properties="nav" media-type="text/html" />
+        <item id="nav" href="nav.html" properties="nav" media-type="application/xhtml+xml" />
         {{#each additionalFiles}}
         <item id="{{filename}}" href="{{folder}}/{{filename}}" media-type="{{mimetype filename}}" />
         {{/each}}
