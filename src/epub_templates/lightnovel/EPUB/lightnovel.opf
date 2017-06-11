@@ -24,34 +24,23 @@
         {{/if}}
     </metadata>
     <manifest>
-        {{#each vol}}
-        <item id="{{id}}" href="{{coverpage}}.xhtml" media-type="application/xhtml+xml" />
-        {{#each chapter}}
-        <item id="{{id}}" href="{{name}}.xhtml" media-type="application/xhtml+xml" />
-        {{/each}}
-        {{/each}}
+        {{#each sections}}{{> sectionOPFManifestTemplate}}{{/each}}
         <item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
+        {{#each additionalFiles}}
+        <item id="{{filename}}" href="{{folder}}/{{filename}}" media-type="{{mimetype filename}}" />
+        {{/each}}
         {{#if coverUrl}}
-        <item id="cover" href="images/{{cover.filename}}" media-type="{{mimetype cover.filename}}" properties="cover-image" />
+        <item id="cover" href="images/{{options.coverFilename}}" media-type="{{mimetype options.coverFilename}}" properties="cover-image" />
         {{/if}}
         <item id="css" href="css/main.css" media-type="text/css" />
         <!-- ncx included for 2.0 reading system compatibility: -->
         <item id="ncx" href="lightnovel.ncx" media-type="application/x-dtbncx+xml" />
     </manifest>
     <spine toc="ncx">
-        {{#each vol}}
-        <itemref idref="{{id}}" />
-        {{#each chapter}}
-        <itemref idref="{{id}}" />
-        {{/each}}
-        {{/each}}
+        <itemref idref="nav" />
+        {{#each sections}}{{> sectionOPFSpineTemplate}}{{/each}}
     </spine>
     <guide>
-        {{#each vol}}
-        <reference type="{{type}}" title="{{title}}" href="{{coverpage}}.html"/>
-        {{#each chapter}}
-        <reference type="{{type}}" title="{{title}}" href="{{name}}.html"/>
-        {{/each}}
-        {{/each}}
+        <reference type="toc" href="nav.xhtml"/>
     </guide>
 </package>

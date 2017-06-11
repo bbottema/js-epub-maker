@@ -1,0 +1,11 @@
+
+<li>
+    {{#if content.content}}
+    <a href="{{name}}.xhtml">{{content.title}}</a>
+    {{/if}}
+    {{#if subSections}}
+    <ol>
+        {{#each subSections}}{{> sectionNavTemplate}}{{/each}}
+    </ol>
+    {{#/if}}
+</li>

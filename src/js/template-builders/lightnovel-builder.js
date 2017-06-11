@@ -14,7 +14,10 @@
         nav: '@@import src/epub_templates/lightnovel/EPUB/nav.xhtml',
         css: '@@import src/epub_templates/lightnovel/EPUB/css/main.css',
         content: '@@import src/epub_templates/lightnovel/EPUB/content.xhtml',
-        coverpage: '@@import src/epub_templates/wasteland/EPUB/coverpage.xhtml'
+        sectionsNavTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-nav-template.xhtml',
+        sectionsNCXTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-ncx-template.xhtml',
+        sectionsOPFManifestTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-opf-manifest-template.xhtml',
+        sectionsOPFSpineTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-opf-spine-template.xhtml'
     };
     
     var Builder = function() {
@@ -24,6 +27,7 @@
             var zip = new JSZip();
             
             var deferred = D();
+            addAditionalInfo(epubConfig);
             D.all(
                 addMimetype(zip),
                 addContainerInfo(zip, epubConfig),
@@ -40,6 +44,34 @@
             
             return deferred.promise;
         };
+
+        function addInfoSection(section, titlePrefix, namePrefix) {
+            if(!section.content) {
+                section.content = {};
+            }
+            if(section.content.content) {
+                if(titlePrefix) {
+                    namePrefix = section.name = namePrefix + '-' + section.rank;
+                    titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
+                }
+                else {
+                    namePrefix = section.name = '' + section.rank;
+                    titlePrefix = section.content.fullTitle = section.content.title;
+                }
+            }
+            for(var i = 0; i < section.subSections.length; i++) {
+                section.subSections[i].rank = i;
+                addInfoSection(section.subSections[i], namePrefix, namePrefix);
+            }
+        }
+
+        function addAditionalInfo(epubConfig) {
+            //Generate name and full title for each section/subsection
+            for(var i = 0; i < epubConfig.sections.length; i++) {
+                epubConfig.sections[i].rank = i;
+                addInfoSection(epubConfig.sections[i]);
+            }
+        }
         
         function addMimetype(zip) {
             zip.file('mimetype', templates.mimetype);
@@ -56,10 +88,10 @@
         function addCover(zip, epubConfig) {
             var deferred = D();
             
-            if (epubConfig.cover) {
-                JSZipUtils.getBinaryContent(epubConfig.cover.url, function (err, data) {
+            if (epubConfig.coverUrl) {
+                JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
                     if (!err) {
-                        zip.folder('EPUB').folder('images').file(epubConfig.cover.filename, data, { binary: true });
+                        zip.folder('EPUB').folder('images').file(epubConfig.options.coverFilename, data, { binary: true });
                         deferred.resolve('');
                     } else {
                         deferred.reject(err);
@@ -118,15 +150,14 @@
             }
             return D.all(deferred_list);
         }
+
+        function addSection(zip, section) {
+            zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.content, section));
+        }
         
         function addContent(zip, epubConfig) {
-            for(var i = 0; i < epubConfig.vol.length; i++) {
-                var vol = epubConfig.vol[i];
-                zip.folder('EPUB').file(vol.coverpage + '.xhtml', compile(templates.coverpage, vol));
-                for(var j = 0l j < vol.chapter.length; j++) {
-                    var chapter = epubConfig.chapter[j];
-                    zip.folder('EPUB').file(chapter.name + '.xhtml', compile(tempaltes.content, chapter));
-                }
+            for(var i = 0; i < epubConfig.sections.length; i++) {
+                addSection(zip, epubConfig.sections[i]);
             }
         }
         

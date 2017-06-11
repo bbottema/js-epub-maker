@@ -1,9 +1,0 @@
-{{!-- strange if-construction, but this is a workaround for gulp-js-html-inject, whose minifier wreaks havoc otherwise --}}
-{{#if epubType}}<section epub:type="{{epubType}}" id="{{id}}">{{else}}<section id="{{id}}">{{/if}}
-
-    {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/if}} 
-    {{#if content.content}}{{{content.content}}}{{/if}}
-    
-    {{#each subSections}} {{> sectionTemplate}} {{/each}}
-    
-{{#if epubType}}</section>{{else}}</section>{{/if}}

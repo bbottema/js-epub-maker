@@ -2,27 +2,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
     xmlns:epub="http://www.idpf.org/2007/ops">
     <head>
-        <meta charset="utf-8"></meta>       
+        <meta charset="utf-8"></meta>
         <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> 
     </head>
     <body>
         <nav epub:type="toc" id="toc">
             <ol>
-                {{#each vol}}
-                <li>
-                    <a href="{{coverpage}}.xhtml">{{title}}</a>
-                    <ol>
-                    {{#each chapter}}
-                    <li><a href="{{name}}.xhtml">{{title}}</a></li>
-                    {{/each}}
-                    </ol>
-                </li>
-                {{/each}}
+                {{#each sections}}{{> sectionNavTemplate}}{{/each}}
             </ol>
         </nav>
         <nav epub:type="landmarks">
             <ol>
-                <li><a epub:type="toc" href="#toc">目录</a></li>
+                <li><a epub:type="toc" href="#toc">{{options.tocName}}</a></li>
             </ol>
         </nav>
     </body>
