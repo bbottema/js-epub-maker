@@ -1090,11 +1090,11 @@ process.umask = function() { return 0; };
 /* global module, require, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
 (function() {
     'use strict';
-    
+
     var D = require('d.js');
     var console = require('../../js/util/console')();
     var ajax = require('../../js/util/ajax');
-    
+
     var templates = {
         mimetype: 'application/epub+zip',
         container: '<?xml version="1.0" encoding="UTF-8"?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n	<rootfiles>\n		<rootfile full-path="EPUB/lightnovel.opf"\n			media-type="application/oebps-package+xml"/>\n	</rootfiles>\n</container>',
@@ -1109,13 +1109,13 @@ process.umask = function() { return 0; };
         sectionsOPFManifestTemplate: '{{#if needPage}}\n<item id="{{name}}" href="{{name}}.xhtml" media-type="application/xhtml+xml" />\n{{/if}}\n{{#each subSections}}{{> sectionsOPFManifestTemplate}}{{/each}}\n',
         sectionsOPFSpineTemplate: '<itemref idref="{{name}}" />\n{{#each subSections}}{{> sectionsOPFSpineTemplate}}{{/each}}\n'
     };
-    
+
     var Builder = function() {
-        
+
         this.make = function(epubConfig) {
             console.debug('building epub', epubConfig);
             var zip = new JSZip();
-            
+
             var deferred = D();
             addAditionalInfo(epubConfig);
             D.all(
@@ -1130,8 +1130,8 @@ process.umask = function() { return 0; };
                 addContent(zip, epubConfig)
             ).then(function() {
                 deferred.resolve(zip);
-            });
-            
+            }, function(err) { console.log(err); });
+
             return deferred.promise;
         };
 
@@ -1142,8 +1142,7 @@ process.umask = function() { return 0; };
             if(titlePrefix) {
                 titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
                 namePrefix = section.name = namePrefix + '-' + section.rank;
-            }
-            else {
+            } else {
                 titlePrefix = section.content.fullTitle = section.content.title;
                 namePrefix = section.name = '' + section.rank;
             }
@@ -1165,27 +1164,27 @@ process.umask = function() { return 0; };
                 addInfoSection(epubConfig.sections[i]);
             }
         }
-        
+
         function addMimetype(zip) {
             zip.file('mimetype', templates.mimetype);
         }
-        
+
         function addContainerInfo(zip, epubConfig) {
             zip.folder('META-INF').file('container.xml', compile(templates.container, epubConfig));
         }
-        
+
         function addManifestOpf(zip, epubConfig) {
             Handlebars.registerPartial('sectionsOPFManifestTemplate', templates.sectionsOPFManifestTemplate);
             Handlebars.registerPartial('sectionsOPFSpineTemplate', templates.sectionsOPFSpineTemplate);
             zip.folder('EPUB').file('lightnovel.opf', compile(templates.opf, epubConfig));
         }
-        
+
         function addCover(zip, epubConfig) {
             var deferred = D();
-            
-            if (epubConfig.coverUrl) {
-                JSZipUtils.getBinaryContent(epubConfig.coverUrl, function (err, data) {
-                    if (!err) {
+
+            if(epubConfig.coverUrl) {
+                JSZipUtils.getBinaryContent(epubConfig.coverUrl, function(err, data) {
+                    if(!err) {
                         zip.folder('EPUB').folder('images').file(epubConfig.options.coverFilename, data, { binary: true });
                         deferred.resolve('');
                     } else {
@@ -1197,20 +1196,20 @@ process.umask = function() { return 0; };
             }
             return deferred.promise;
         }
-        
+
         function addEpub2Nav(zip, epubConfig) {
             Handlebars.registerPartial('sectionsNCXTemplate', templates.sectionsNCXTemplate);
             zip.folder('EPUB').file('lightnovel.ncx', compile(templates.ncx, epubConfig));
         }
-        
+
         function addEpub3Nav(zip, epubConfig) {
             Handlebars.registerPartial('sectionsNavTemplate', templates.sectionsNavTemplate);
             zip.folder('EPUB').file('nav.xhtml', compile(templates.nav, epubConfig));
         }
-        
+
         function addStylesheets(zip, epubConfig) {
             var deferred = D();
-            if (epubConfig.stylesheet.url) {
+            if(epubConfig.stylesheet.url) {
                 return ajax(epubConfig.stylesheet.url).then(function(result) {
                     epubConfig.styles = result.data;
                     compileAndAddCss();
@@ -1219,7 +1218,7 @@ process.umask = function() { return 0; };
                 compileAndAddCss();
             }
             return deferred.promise;
-            
+
             function compileAndAddCss() {
                 var styles = {
                     original: epubConfig.stylesheet.replaceOriginal ? '' : templates.css,
@@ -1235,14 +1234,16 @@ process.umask = function() { return 0; };
             for(var i = 0; i < epubConfig.additionalFiles.length; i++) {
                 var file = epubConfig.additionalFiles[i];
                 var deferred = new D();
-                JSZipUtils.getBinaryContent(file.url, function (err, data) {
-                    if (!err) {
-                        zip.folder('EPUB').folder(file.folder).file(file.filename, data, { binary: true });
-                        deferred.resolve('');
-                    } else {
-                        deferred.reject(err);
-                    }
-                });
+                JSZipUtils.getBinaryContent(file.url, (function(file, deferred) {
+                    return function(err, data) {
+                        if(!err) {
+                            zip.folder('EPUB').folder(file.folder).file(file.filename, data, { binary: true });
+                            deferred.resolve('');
+                        } else {
+                            deferred.reject(err);
+                        }
+                    };
+                })(file, deferred));
                 deferred_list.push(deferred.promise);
             }
             return D.all(deferred_list);
@@ -1252,8 +1253,7 @@ process.umask = function() { return 0; };
             if(section.needPage) {
                 if(section.epubType == 'auto-toc') {
                     zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.autoToc, section));
-                }
-                else {
+                } else {
                     zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.content, section));
                 }
             }
@@ -1261,19 +1261,19 @@ process.umask = function() { return 0; };
                 addSection(zip, section.subSections[i]);
             }
         }
-        
+
         function addContent(zip, epubConfig) {
             for(var i = 0; i < epubConfig.sections.length; i++) {
                 addSection(zip, epubConfig.sections[i]);
             }
         }
-        
+
         function compile(template, content, skipFormatting) {
             return formatHTML(Handlebars.compile(template)(content));
-            
+
             function formatHTML(htmlstr) {
                 /*jslint camelcase:false*/
-                return (skipFormatting || typeof html_beautify === 'undefined') ? htmlstr : 
+                return(skipFormatting || typeof html_beautify === 'undefined') ? htmlstr :
                     html_beautify(htmlstr, {
                         'end_with_newline': false,
                         'indent_char': '\t',
@@ -1291,20 +1291,19 @@ process.umask = function() { return 0; };
     };
 
     // manage dependency exports
-    if (typeof module !== 'undefined') {
+    if(typeof module !== 'undefined') {
         module.exports.builder = new Builder();
-    }
-    else if (typeof exports !== 'undefined') {
+    } else if(typeof exports !== 'undefined') {
         exports.builder = new Builder();
-    }
-    else if (typeof window === 'undefined') {
+    } else if(typeof window === 'undefined') {
         throw new Error('unable to expose module: no module, exports object and no global window detected');
     }
 
-    if (typeof window !== 'undefined') {
+    if(typeof window !== 'undefined') {
         window.epubMaker = new Builder();
     }
 }());
+
 },{"../../js/util/ajax":7,"../../js/util/console":8,"d.js":3}],7:[function(require,module,exports){
 /* global module, ActiveXObject */
 (function() {
