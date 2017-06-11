@@ -8,12 +8,13 @@
     require('./js/util/handlebar-helpers');
 
     var templateManagers = {
-        'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder
+        'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder,
+        'lightnovel': require('../src/js/template-builders/lightnovel-builder.js').builder
     };
 
     var EpubMaker = function () {
         var self = this;
-        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {} };
+        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {}, additionalFiles: [] };
 
         this.withUuid = function(uuid) {
             epubConfig.uuid = uuid;
@@ -71,11 +72,6 @@
             return self;
         };
 
-        this.withVolumes = function(vol) {
-            epubConfig.vol = vol;
-            return self;
-        }
-
         this.withSection = function(section) {
             epubConfig.sections.push(section);
             Array.prototype.push.apply(epubConfig.toc, section.collectToc());
@@ -83,23 +79,37 @@
             return self;
         };
 
+        this.withAdditionalFile = function(fileUrl, folder, filename) {
+            epubConfig.additionalFiles.push({
+                url: fileUrl,
+                folder: folder,
+                filename: filename
+            });
+            return self;
+        };
+
+        this.withOption = function(key, value) {
+            epubConfig.options[key] = value;
+            return self;
+        }
+
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
-    			console.info('generating epub for: ' + epubConfig.title);
-    			var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
-    			return content;
+                console.info('generating epub for: ' + epubConfig.title);
+                var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
+                return content;
             });
         };
 
         this.downloadEpub = function(callback) {
             self.makeEpub().then(function(epubZipContent) {
-    			var filename = epubConfig.slug + '.epub';
-    			console.debug('saving "' + filename + '"...');
+                var filename = epubConfig.slug + '.epub';
+                console.debug('saving "' + filename + '"...');
                 if (callback && typeof(callback) === 'function') {
                     callback(epubZipContent, filename);
                 }
-    			saveAs(epubZipContent, filename);
+                saveAs(epubZipContent, filename);
             });
         };
     };

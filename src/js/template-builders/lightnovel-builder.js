@@ -66,6 +66,8 @@
         }
 
         function addAditionalInfo(epubConfig) {
+            //Default options
+            epubConfig.options.tocName = epubConfig.options.tocName || 'Menu';
             //Generate name and full title for each section/subsection
             for(var i = 0; i < epubConfig.sections.length; i++) {
                 epubConfig.sections[i].rank = i;
@@ -135,7 +137,7 @@
 
         function addFiles(zip, epubConfig) {
             var deferred_list = [];
-            for(var i = 0; epubConfig.additionalFiles && i < epubConfig.additionalFiles.length; i++) {
+            for(var i = 0; i < epubConfig.additionalFiles.length; i++) {
                 var file = epubConfig.additionalFiles[i];
                 var deferred = new D();
                 JSZipUtils.getBinaryContent(file.url, function (err, data) {
