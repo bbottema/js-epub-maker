@@ -109,9 +109,15 @@
             });
         };
 
-        this.downloadEpub = function(callback) {
+        this.downloadEpub = function(callback, useTitle) {
             self.makeEpub().then(function(epubZipContent) {
-                var filename = epubConfig.title + '.epub';
+                var filename;
+                if(useTitle) {
+                    filename = epubConfig.title + '.epub';
+                }
+                else {
+                    filename = epubConfig.slug + '.epub';
+                }
                 console.debug('saving "' + filename + '"...');
                 if (callback && typeof(callback) === 'function') {
                     callback(epubZipContent, filename);
