@@ -44,6 +44,7 @@
 
         this.withModificationDate = function(modificationDate) {
             epubConfig.modificationDate = modificationDate.toISOString();
+            epubConfig.modificationDateYMD = epubConfig.modificationDate.substr(0, 10);
             return self;
         };
 
@@ -95,6 +96,7 @@
 
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
+            epubConfig.publicationDateYMD = epubConfig.publicationDate.substr(0, 10);
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
                 console.info('generating epub for: ' + epubConfig.title);
                 var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });

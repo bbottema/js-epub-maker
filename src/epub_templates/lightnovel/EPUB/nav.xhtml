@@ -6,12 +6,22 @@
         <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> 
     </head>
     <body>
+        <div class="cover divimage">
+            <img src="images/{{options.coverFilename}}" alt="Cover" />
+        </div>
+        <div class="center">
+            <h1>{{title}}</h1>
+            <div>{{author}}</div>
+            <div>{{publisher}}</div>
+            <div>{{modificationDateYMD}}</div>
+        </div>
+
         <nav epub:type="toc" id="toc">
             <ol>
                 {{#each sections}}{{> sectionsNavTemplate}}{{/each}}
             </ol>
         </nav>
-        <nav epub:type="landmarks">
+        <nav class="hidden" epub:type="landmarks">
             <ol>
                 <li><a epub:type="toc" href="#toc">{{options.tocName}}</a></li>
             </ol>

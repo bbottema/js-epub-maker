@@ -14,6 +14,7 @@
         nav: '@@import src/epub_templates/lightnovel/EPUB/nav.xhtml',
         css: '@@import src/epub_templates/lightnovel/EPUB/css/main.css',
         content: '@@import src/epub_templates/lightnovel/EPUB/content.xhtml',
+        autoToc: '@@import src/epub_templates/lightnovel/EPUB/auto-toc.xhtml',
         sectionsNavTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-nav-template.xhtml',
         sectionsNCXTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-ncx-template.xhtml',
         sectionsOPFManifestTemplate: '@@import src/epub_templates/lightnovel/EPUB/sections-opf-manifest-template.xhtml',
@@ -49,19 +50,20 @@
             if(!section.content) {
                 section.content = {};
             }
-            if(section.content.content) {
-                if(titlePrefix) {
-                    namePrefix = section.name = namePrefix + '-' + section.rank;
-                    titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
-                }
-                else {
-                    namePrefix = section.name = '' + section.rank;
-                    titlePrefix = section.content.fullTitle = section.content.title;
-                }
+            if(titlePrefix) {
+                titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
+                namePrefix = section.name = namePrefix + '-' + section.rank;
+            }
+            else {
+                titlePrefix = section.content.fullTitle = section.content.title;
+                namePrefix = section.name = '' + section.rank;
+            }
+            if(section.content.content || section.content.renderTitle || section.epubType == 'auto-toc') {
+                section.needPage = true;
             }
             for(var i = 0; i < section.subSections.length; i++) {
                 section.subSections[i].rank = i;
-                addInfoSection(section.subSections[i], namePrefix, namePrefix);
+                addInfoSection(section.subSections[i], titlePrefix, namePrefix);
             }
         }
 
@@ -158,7 +160,17 @@
         }
 
         function addSection(zip, section) {
-            zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.content, section));
+            if(section.needPage) {
+                if(section.epubType == 'auto-toc') {
+                    zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.autoToc, section));
+                }
+                else {
+                    zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.content, section));
+                }
+            }
+            for(var i = 0; i < section.subSections.length; i++) {
+                addSection(zip, section.subSections[i]);
+            }
         }
         
         function addContent(zip, epubConfig) {

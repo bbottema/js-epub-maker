@@ -45,6 +45,7 @@
 
         this.withModificationDate = function(modificationDate) {
             epubConfig.modificationDate = modificationDate.toISOString();
+            epubConfig.modificationDateYMD = epubConfig.modificationDate.substr(0, 10);
             return self;
         };
 
@@ -96,6 +97,7 @@
 
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
+            epubConfig.publicationDateYMD = epubConfig.publicationDate.substr(0, 10);
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
                 console.info('generating epub for: ' + epubConfig.title);
                 var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
@@ -1093,12 +1095,13 @@ process.umask = function() { return 0; };
         container: '<?xml version="1.0" encoding="UTF-8"?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n	<rootfiles>\n		<rootfile full-path="EPUB/lightnovel.opf"\n			media-type="application/oebps-package+xml"/>\n	</rootfiles>\n</container>',
         opf: '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">\n    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n        <dc:identifier id="uid">{{uuid}}</dc:identifier>\n        <dc:title>{{title}}</dc:title>\n        <dc:creator>{{author}}</dc:creator>\n        <dc:language>{{lang}}</dc:language>\n        <dc:date>{{publicationDate}}</dc:date>\n        <meta property="dcterms:modified">{{modificationDate}}</meta>\n        {{#if rights}}\n            <!-- rights expressions for the work as a whole -->\n            {{#if rights.description}}<dc:rights>{{rights.description}}</dc:rights>{{/if}}\n            {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}\n            {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}\n        {{/if}}\n        {{#if coverUrl}}\n            {{#if coverRights}}\n                <!-- rights expression for the cover image -->       \n                {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}\n                {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}\n            {{/if}}\n                <!-- cover meta element included for 2.0 reading system compatibility: -->\n                <meta name="cover" content="cover"/>\n        {{/if}}\n    </metadata>\n    <manifest>\n        {{#each sections}}{{> sectionsOPFManifestTemplate}}{{/each}}\n        <item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />\n        {{#each additionalFiles}}\n        <item id="{{filename}}" href="{{folder}}/{{filename}}" media-type="{{mimetype filename}}" />\n        {{/each}}\n        {{#if coverUrl}}\n        <item id="cover" href="images/{{options.coverFilename}}" media-type="{{mimetype options.coverFilename}}" properties="cover-image" />\n        {{/if}}\n        <item id="css" href="css/main.css" media-type="text/css" />\n        <!-- ncx included for 2.0 reading system compatibility: -->\n        <item id="ncx" href="lightnovel.ncx" media-type="application/x-dtbncx+xml" />\n    </manifest>\n    <spine toc="ncx">\n        <itemref idref="nav" />\n        {{#each sections}}{{> sectionsOPFSpineTemplate}}{{/each}}\n    </spine>\n    <guide>\n        <reference type="toc" href="nav.xhtml"/>\n    </guide>\n</package>\n',
         ncx: '<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/"\n    version="2005-1" xml:lang="en">\n    <head>\n        <meta name="dtb:uid" content="{{uuid}}"/>\n    </head>\n    <docTitle>\n        <text>{{title}}</text>\n    </docTitle>\n    <docAuthor>\n        <text>{{author}}</text>\n    </docAuthor>\n    <navMap>\n        <!-- 2.01 NCX: playOrder is optional -->\n        {{#each sections}}{{> sectionsNCXTemplate}}{{/each}}\n    </navMap>\n</ncx>\n',
-        nav: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"\n    xmlns:epub="http://www.idpf.org/2007/ops">\n    <head>\n        <meta charset="utf-8"></meta>\n        <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> \n    </head>\n    <body>\n        <nav epub:type="toc" id="toc">\n            <ol>\n                {{#each sections}}{{> sectionsNavTemplate}}{{/each}}\n            </ol>\n        </nav>\n        <nav epub:type="landmarks">\n            <ol>\n                <li><a epub:type="toc" href="#toc">{{options.tocName}}</a></li>\n            </ol>\n        </nav>\n    </body>\n</html>\n',
-        css: '@charset "UTF-8";\n@namespace "http://www.w3.org/1999/xhtml";\n@namespace epub "http://www.idpf.org/2007/ops";\n\nbody {\n    padding: 0%;\n    margin-top: 0%;\n    margin-bottom: 0%;\n    margin-left: 1%;\n    margin-right: 1%;\n    line-height: 130%;\n    text-align: justify;\n    background-color: rgb(255, 255, 245);\n}\n\ndiv {\n    margin: 0px;\n    padding: 0px;\n    line-height: 130%;\n    text-align: justify;\n}\n\np {\n    text-align: justify;\n    text-indent: 2em;\n    line-height: 130%;\n    margin-bottom: -0.8em;\n}\n\n.divimage {\n    page-break-after: always;\n}\n\n.cover {\n    width: 100%;\n    padding: 0px;\n}\n\n.center {\n    text-align: center;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.left {\n    text-align: center;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.right {\n    text-align: right;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.quote {\n    margin-top: 0%;\n    margin-bottom: 0%;\n    margin-left: 1em;\n    margin-right: 1em;\n    text-align: justify;\n}\n\nh1 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: xx-large;\n}\n\nh2 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: x-large;\n}\n\nh3 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: large;\n}\n\nh4 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: medium;\n}\n\nh5 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: small;\n}\n\nh6 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: x-small;\n}\n',
-        content: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:epub="http://www.idpf.org/2007/ops">\n    <head>\n        <meta charset="utf-8"></meta>\n        <title>{{content.fullTitle}}</title>\n        <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> \n    </head>\n    <body>\n        {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/if}} \n        {{{content.content}}}\n    </body>\n</html>\n',
-        sectionsNavTemplate: '\n<li>\n    {{#if content.content}}\n    <a href="{{name}}.xhtml">{{content.title}}</a>\n    {{/if}}\n    {{#if subSections}}\n    <ol>\n        {{#each subSections}}{{> sectionsNavTemplate}}{{/each}}\n    </ol>\n    {{/if}}\n</li>\n',
-        sectionsNCXTemplate: '\n<navPoint id="{{name}}">\n    <navLabel>\n        <text>{{content.title}}</text>\n    </navLabel>\n    {{#if content.content}}\n    <content src="{{name}}.xhtml"/>\n    {{/if}}\n    {{#each subSections}} {{> sectionsNCXTemplate}} {{/each}}\n</navPoint>\n',
-        sectionsOPFManifestTemplate: '{{#if content.content}}\n<item id="{{name}}" href="{{name}}.xhtml" media-type="application/xhtml+xml" />\n{{/if}}\n{{#each subSections}}{{> sectionsOPFManifestTemplate}}{{/each}}\n',
+        nav: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"\n    xmlns:epub="http://www.idpf.org/2007/ops">\n    <head>\n        <meta charset="utf-8"></meta>\n        <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> \n    </head>\n    <body>\n        <div class="cover divimage">\n            <img src="images/{{options.coverFilename}}" alt="Cover" />\n        </div>\n        <div class="center">\n            <h1>{{title}}</h1>\n            <div>{{author}}</div>\n            <div>{{publisher}}</div>\n            <div>{{modificationDateYMD}}</div>\n        </div>\n\n        <nav epub:type="toc" id="toc">\n            <ol>\n                {{#each sections}}{{> sectionsNavTemplate}}{{/each}}\n            </ol>\n        </nav>\n        <nav class="hidden" epub:type="landmarks">\n            <ol>\n                <li><a epub:type="toc" href="#toc">{{options.tocName}}</a></li>\n            </ol>\n        </nav>\n    </body>\n</html>\n',
+        css: '@charset "UTF-8";\n@namespace "http://www.w3.org/1999/xhtml";\n@namespace epub "http://www.idpf.org/2007/ops";\n\nbody {\n    padding: 0%;\n    margin-top: 0%;\n    margin-bottom: 0%;\n    margin-left: 1%;\n    margin-right: 1%;\n    line-height: 130%;\n    text-align: justify;\n    background-color: rgb(255, 255, 245);\n}\n\ndiv {\n    margin: 0px;\n    padding: 0px;\n    line-height: 130%;\n    text-align: justify;\n}\n\np {\n    text-align: justify;\n    text-indent: 2em;\n    line-height: 130%;\n    margin-bottom: -0.8em;\n}\n\n.divimage {\n    page-break-after: always;\n}\n\n.cover {\n    width: 100%;\n    padding: 0px;\n}\n\n.center {\n    text-align: center;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.left {\n    text-align: center;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.right {\n    text-align: right;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.quote {\n    margin-top: 0%;\n    margin-bottom: 0%;\n    margin-left: 1em;\n    margin-right: 1em;\n    text-align: justify;\n}\n\n.hidden {\n    display: none;\n}\n\nh1 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: xx-large;\n}\n\nh2 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: x-large;\n}\n\nh3 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: large;\n}\n\nh4 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: medium;\n}\n\nh5 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: small;\n}\n\nh6 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: x-small;\n}\n',
+        content: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" xmlns:epub="http://www.idpf.org/2007/ops">\n    <head>\n        <meta charset="utf-8"></meta>\n        <title>{{content.fullTitle}}</title>\n        <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> \n    </head>\n    <body>\n        {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/if}} \n        {{#if content.content}}{{{content.content}}}{{/if}}\n    </body>\n</html>\n',
+        autoToc: '<?xml version="1.0" encoding="UTF-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"\n    xmlns:epub="http://www.idpf.org/2007/ops">\n    <head>\n        <meta charset="utf-8"></meta>\n        <link rel="stylesheet" type="text/css" href="css/main.css" class="day" title="day"/> \n    </head>\n    <body>\n        {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/if}}\n        {{#if subSections}}\n        <ol>\n            {{#each subSections}}{{> sectionsNavTemplate}}{{/each}}\n        </ol>\n        {{/if}}\n    </body>\n</html>\n',
+        sectionsNavTemplate: '\n<li>\n    {{#if needPage}}\n    <a href="{{name}}.xhtml">{{content.title}}</a>\n    {{/if}}\n    {{#if subSections}}\n    <ol>\n        {{#each subSections}}{{> sectionsNavTemplate}}{{/each}}\n    </ol>\n    {{/if}}\n</li>\n',
+        sectionsNCXTemplate: '\n<navPoint id="{{name}}">\n    <navLabel>\n        <text>{{content.title}}</text>\n    </navLabel>\n    {{#if needPage}}\n    <content src="{{name}}.xhtml"/>\n    {{/if}}\n    {{#each subSections}} {{> sectionsNCXTemplate}} {{/each}}\n</navPoint>\n',
+        sectionsOPFManifestTemplate: '{{#if needPage}}\n<item id="{{name}}" href="{{name}}.xhtml" media-type="application/xhtml+xml" />\n{{/if}}\n{{#each subSections}}{{> sectionsOPFManifestTemplate}}{{/each}}\n',
         sectionsOPFSpineTemplate: '<itemref idref="{{name}}" />\n{{#each subSections}}{{> sectionsOPFSpineTemplate}}{{/each}}\n'
     };
     
@@ -1131,19 +1134,20 @@ process.umask = function() { return 0; };
             if(!section.content) {
                 section.content = {};
             }
-            if(section.content.content) {
-                if(titlePrefix) {
-                    namePrefix = section.name = namePrefix + '-' + section.rank;
-                    titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
-                }
-                else {
-                    namePrefix = section.name = '' + section.rank;
-                    titlePrefix = section.content.fullTitle = section.content.title;
-                }
+            if(titlePrefix) {
+                titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
+                namePrefix = section.name = namePrefix + '-' + section.rank;
+            }
+            else {
+                titlePrefix = section.content.fullTitle = section.content.title;
+                namePrefix = section.name = '' + section.rank;
+            }
+            if(section.content.content || section.content.renderTitle || section.epubType == 'auto-toc') {
+                section.needPage = true;
             }
             for(var i = 0; i < section.subSections.length; i++) {
                 section.subSections[i].rank = i;
-                addInfoSection(section.subSections[i], namePrefix, namePrefix);
+                addInfoSection(section.subSections[i], titlePrefix, namePrefix);
             }
         }
 
@@ -1240,7 +1244,17 @@ process.umask = function() { return 0; };
         }
 
         function addSection(zip, section) {
-            zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.content, section));
+            if(section.needPage) {
+                if(section.epubType == 'auto-toc') {
+                    zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.autoToc, section));
+                }
+                else {
+                    zip.folder('EPUB').file(section.name + '.xhtml', compile(templates.content, section));
+                }
+            }
+            for(var i = 0; i < section.subSections.length; i++) {
+                addSection(zip, section.subSections[i]);
+            }
         }
         
         function addContent(zip, epubConfig) {
