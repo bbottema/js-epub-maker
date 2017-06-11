@@ -1,4 +1,4 @@
 {{#if needPage}}
-<item id="{{name}}" href="{{name}}.xhtml" media-type="application/xhtml+xml" />
+<item id="{{name}}" href="{{name}}.html" media-type="text/html" />
 {{/if}}
 {{#each subSections}}{{> sectionsOPFManifestTemplate}}{{/each}}
