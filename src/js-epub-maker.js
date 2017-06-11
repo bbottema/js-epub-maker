@@ -111,7 +111,7 @@
 
         this.downloadEpub = function(callback) {
             self.makeEpub().then(function(epubZipContent) {
-                var filename = epubConfig.slug + '.epub';
+                var filename = epubConfig.title + '.epub';
                 console.debug('saving "' + filename + '"...');
                 if (callback && typeof(callback) === 'function') {
                     callback(epubZipContent, filename);
