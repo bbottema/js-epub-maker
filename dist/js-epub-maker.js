@@ -15,7 +15,7 @@
 
     var EpubMaker = function () {
         var self = this;
-        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {}, additionalFiles: [] };
+        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {}, additionalFiles: [], options: {} };
 
         this.withUuid = function(uuid) {
             epubConfig.uuid = uuid;
