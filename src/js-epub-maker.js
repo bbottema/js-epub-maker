@@ -42,6 +42,11 @@
             return self;
         };
 
+        this.withPublisher = function(publisher) {
+            epubConfig.publisher = publisher;
+            return self;
+        };
+
         this.withModificationDate = function(modificationDate) {
             epubConfig.modificationDate = modificationDate.toISOString();
             epubConfig.modificationDateYMD = epubConfig.modificationDate.substr(0, 10);
