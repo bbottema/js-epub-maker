@@ -84,6 +84,8 @@
         }
         
         function addManifestOpf(zip, epubConfig) {
+            Handlebars.registerPartial('sectionsOPFManifestTemplate', templates.sectionsOPFManifestTemplate);
+            Handlebars.registerPartial('sectionsOPFSpineTemplate', templates.sectionsOPFSpineTemplate);
             zip.folder('EPUB').file('lightnovel.opf', compile(templates.opf, epubConfig));
         }
         
@@ -106,10 +108,12 @@
         }
         
         function addEpub2Nav(zip, epubConfig) {
+            Handlebars.registerPartial('sectionsNCXTemplate', templates.sectionsNCXTemplate);
             zip.folder('EPUB').file('lightnovel.ncx', compile(templates.ncx, epubConfig));
         }
         
         function addEpub3Nav(zip, epubConfig) {
+            Handlebars.registerPartial('sectionsNavTemplate', templates.sectionsNavTemplate);
             zip.folder('EPUB').file('nav.xhtml', compile(templates.nav, epubConfig));
         }
         
