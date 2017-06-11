@@ -12,6 +12,6 @@
     </docAuthor>
     <navMap>
         <!-- 2.01 NCX: playOrder is optional -->
-        {{#each sections}}{{> sectionNCXTemplate}}{{/each}}
+        {{#each sections}}{{> sectionsNCXTemplate}}{{/each}}
     </navMap>
 </ncx>

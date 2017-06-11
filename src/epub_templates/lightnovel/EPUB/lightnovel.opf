@@ -24,7 +24,7 @@
         {{/if}}
     </metadata>
     <manifest>
-        {{#each sections}}{{> sectionOPFManifestTemplate}}{{/each}}
+        {{#each sections}}{{> sectionsOPFManifestTemplate}}{{/each}}
         <item id="nav" href="nav.xhtml" properties="nav" media-type="application/xhtml+xml" />
         {{#each additionalFiles}}
         <item id="{{filename}}" href="{{folder}}/{{filename}}" media-type="{{mimetype filename}}" />
@@ -38,7 +38,7 @@
     </manifest>
     <spine toc="ncx">
         <itemref idref="nav" />
-        {{#each sections}}{{> sectionOPFSpineTemplate}}{{/each}}
+        {{#each sections}}{{> sectionsOPFSpineTemplate}}{{/each}}
     </spine>
     <guide>
         <reference type="toc" href="nav.xhtml"/>
