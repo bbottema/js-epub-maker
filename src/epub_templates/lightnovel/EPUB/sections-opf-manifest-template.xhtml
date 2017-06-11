@@ -1,6 +1,4 @@
 {{#if content.content}}
 <item id="{{name}}" href="{{name}}.xhtml" media-type="application/xhtml+xml" />
 {{/if}}
-{{#if subSections}}
 {{#each subSections}}{{> sectionsOPFManifestTemplate}}{{/each}}
-{{/if}}
