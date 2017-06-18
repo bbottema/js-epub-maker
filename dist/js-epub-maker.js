@@ -9,12 +9,13 @@
     require('./js/util/handlebar-helpers');
 
     var templateManagers = {
-        'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder
+        'idpf-wasteland': require('../src/js/template-builders/idpf-wasteland-builder.js').builder,
+        'lightnovel': require('../src/js/template-builders/lightnovel-builder.js').builder
     };
 
     var EpubMaker = function () {
         var self = this;
-        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {} };
+        var epubConfig = { toc: [], landmarks: [], sections: [], stylesheet: {}, additionalFiles: [], options: {} };
 
         this.withUuid = function(uuid) {
             epubConfig.uuid = uuid;
@@ -42,8 +43,14 @@
             return self;
         };
 
+        this.withPublisher = function(publisher) {
+            epubConfig.publisher = publisher;
+            return self;
+        };
+
         this.withModificationDate = function(modificationDate) {
             epubConfig.modificationDate = modificationDate.toISOString();
+            epubConfig.modificationDateYMD = epubConfig.modificationDate.substr(0, 10);
             return self;
         };
 
@@ -79,23 +86,44 @@
             return self;
         };
 
+        this.withAdditionalFile = function(fileUrl, folder, filename) {
+            epubConfig.additionalFiles.push({
+                url: fileUrl,
+                folder: folder,
+                filename: filename
+            });
+            return self;
+        };
+
+        this.withOption = function(key, value) {
+            epubConfig.options[key] = value;
+            return self;
+        };
+
         this.makeEpub = function() {
             epubConfig.publicationDate = new Date().toISOString();
+            epubConfig.publicationDateYMD = epubConfig.publicationDate.substr(0, 10);
             return templateManagers[epubConfig.templateName].make(epubConfig).then(function(epubZip) {
-    			console.info('generating epub for: ' + epubConfig.title);
-    			var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
-    			return content;
+                console.info('generating epub for: ' + epubConfig.title);
+                var content = epubZip.generate({ type: 'blob', mimeType: 'application/epub+zip', compression: 'DEFLATE' });
+                return content;
             });
         };
 
-        this.downloadEpub = function(callback) {
+        this.downloadEpub = function(callback, useTitle) {
             self.makeEpub().then(function(epubZipContent) {
-    			var filename = epubConfig.slug + '.epub';
-    			console.debug('saving "' + filename + '"...');
+                var filename;
+                if(useTitle) {
+                    filename = epubConfig.title + '.epub';
+                }
+                else {
+                    filename = epubConfig.slug + '.epub';
+                }
+                console.debug('saving "' + filename + '"...');
                 if (callback && typeof(callback) === 'function') {
                     callback(epubZipContent, filename);
                 }
-    			saveAs(epubZipContent, filename);
+                saveAs(epubZipContent, filename);
             });
         };
     };
@@ -158,7 +186,193 @@
         window.EpubMaker = EpubMaker;
     }
 }());
-},{"../src/js/epub-types.js":4,"../src/js/template-builders/idpf-wasteland-builder.js":5,"./js/util/console":7,"./js/util/handlebar-helpers":8,"./js/util/slugify":9}],2:[function(require,module,exports){
+},{"../src/js/epub-types.js":4,"../src/js/template-builders/idpf-wasteland-builder.js":5,"../src/js/template-builders/lightnovel-builder.js":6,"./js/util/console":8,"./js/util/handlebar-helpers":9,"./js/util/slugify":10}],2:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],3:[function(require,module,exports){
 (function (process){
 /**
 * attempt of a simple defer/promise library for mobile development
@@ -616,193 +830,7 @@
 })();
 
 }).call(this,require('_process'))
-},{"_process":3}],3:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],4:[function(require,module,exports){
+},{"_process":2}],4:[function(require,module,exports){
 /* global module */
 (function() {
    'use strict';
@@ -1064,7 +1092,225 @@ process.umask = function() { return 0; };
         window.epubMaker = new Builder();
     }
 }());
-},{"../../js/util/ajax":6,"../../js/util/console":7,"d.js":2}],6:[function(require,module,exports){
+},{"../../js/util/ajax":7,"../../js/util/console":8,"d.js":3}],6:[function(require,module,exports){
+/* global module, require, exports, JSZip, JSZipUtils, Handlebars, html_beautify */
+(function() {
+    'use strict';
+
+    var D = require('d.js');
+    var console = require('../../js/util/console')();
+    var ajax = require('../../js/util/ajax');
+
+    var templates = {
+        mimetype: 'application/epub+zip',
+        container: '<?xml version="1.0" encoding="UTF-8"?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n	<rootfiles>\n		<rootfile full-path="EPUB/lightnovel.opf"\n			media-type="application/oebps-package+xml"/>\n	</rootfiles>\n</container>',
+        opf: '<?xml version="1.0" encoding="UTF-8"?>\n<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">\n    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n        <dc:identifier id="uid">{{uuid}}</dc:identifier>\n        <dc:title>{{title}}</dc:title>\n        <dc:creator>{{author}}</dc:creator>\n        <dc:language>{{lang}}</dc:language>\n        <dc:date>{{publicationDate}}</dc:date>\n        <meta property="dcterms:modified">{{modificationDate}}</meta>\n        {{#if rights}}\n            <!-- rights expressions for the work as a whole -->\n            {{#if rights.description}}<dc:rights>{{rights.description}}</dc:rights>{{/if}}\n            {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}\n            {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}\n        {{/if}}\n        {{#if coverUrl}}\n            {{#if coverRights}}\n                <!-- rights expression for the cover image -->       \n                {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}\n                {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}\n            {{/if}}\n                <!-- cover meta element included for 2.0 reading system compatibility: -->\n                <meta name="cover" content="cover"/>\n        {{/if}}\n    </metadata>\n    <manifest>\n        {{#each sections}}{{> sectionsOPFManifestTemplate}}{{/each}}\n        <item id="nav" href="nav.html" properties="nav" media-type="application/xhtml+xml" />\n        {{#each additionalFiles}}\n        <item id="{{filename}}" href="{{folder}}/{{filename}}" media-type="{{mimetype filename}}" />\n        {{/each}}\n        {{#if coverUrl}}\n        <item id="cover" href="images/{{options.coverFilename}}" media-type="{{mimetype options.coverFilename}}" properties="cover-image" />\n        {{/if}}\n        <item id="css" href="css/main.css" media-type="text/css" />\n        <!-- ncx included for 2.0 reading system compatibility: -->\n        <item id="ncx" href="lightnovel.ncx" media-type="application/x-dtbncx+xml" />\n    </manifest>\n    <spine toc="ncx">\n        <itemref idref="nav" />\n        {{#each sections}}{{> sectionsOPFSpineTemplate}}{{/each}}\n    </spine>\n    <guide>\n        <reference type="toc" href="nav.html"/>\n    </guide>\n</package>\n',
+        ncx: '<?xml version="1.0" encoding="UTF-8"?>\n<ncx xmlns:ncx="http://www.daisy.org/z3986/2005/ncx/" xmlns="http://www.daisy.org/z3986/2005/ncx/"\n    version="2005-1" xml:lang="en">\n    <head>\n        <meta name="dtb:uid" content="{{uuid}}"/>\n    </head>\n    <docTitle>\n        <text>{{title}}</text>\n    </docTitle>\n    <docAuthor>\n        <text>{{author}}</text>\n    </docAuthor>\n    <navMap>\n        <!-- 2.01 NCX: playOrder is optional -->\n        {{#each sections}}{{> sectionsNCXTemplate}}{{/each}}\n    </navMap>\n</ncx>\n',
+        nav: '<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset="utf-8">\n        <title>{{options.tocName}}</title>\n        <link rel="stylesheet" type="text/css" href="css/main.css"> \n    </head>\n    <body>\n        <div class="cover divimage">\n            <img src="images/{{options.coverFilename}}" alt="Cover" />\n        </div>\n        <div class="center">\n            <h1>{{title}}</h1>\n            <div>{{author}}</div>\n            <div>{{publisher}}</div>\n            <div>{{modificationDateYMD}}</div>\n        </div>\n\n        <nav epub:type="toc" id="toc">\n            <ol>\n                {{#each sections}}{{> sectionsNavTemplate}}{{/each}}\n            </ol>\n        </nav>\n        <nav class="hidden" epub:type="landmarks">\n            <ol>\n                <li><a epub:type="toc" href="#toc">{{options.tocName}}</a></li>\n            </ol>\n        </nav>\n    </body>\n</html>\n',
+        css: '@charset "UTF-8";\n@namespace "http://www.w3.org/1999/xhtml";\n@namespace epub "http://www.idpf.org/2007/ops";\n\nbody {\n    padding: 0%;\n    margin-top: 0%;\n    margin-bottom: 0%;\n    margin-left: 1%;\n    margin-right: 1%;\n    line-height: 130%;\n    text-align: justify;\n    background-color: rgb(255, 255, 245);\n}\n\ndiv {\n    margin: 0px;\n    padding: 0px;\n    line-height: 130%;\n    text-align: justify;\n}\n\np {\n    text-align: justify;\n    text-indent: 2em;\n    line-height: 130%;\n    margin-bottom: -0.8em;\n}\n\n.divimage {\n    page-break-after: always;\n}\n\n.cover {\n    width: 100%;\n    padding: 0px;\n}\n\n.center {\n    text-align: center;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.left {\n    text-align: center;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.right {\n    text-align: right;\n    margin-left: 0%;\n    margin-right: 0%;\n}\n\n.quote {\n    margin-top: 0%;\n    margin-bottom: 0%;\n    margin-left: 1em;\n    margin-right: 1em;\n    text-align: justify;\n}\n\n.hidden {\n    display: none;\n}\n\nh1 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: xx-large;\n}\n\nh2 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: x-large;\n}\n\nh3 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: large;\n}\n\nh4 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: medium;\n}\n\nh5 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: small;\n}\n\nh6 {\n    line-height: 130%;\n    text-align: center;\n    font-weight: bold;\n    font-size: x-small;\n}\n',
+        content: '<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset="utf-8">\n        <title>{{content.fullTitle}}</title>\n        <link rel="stylesheet" type="text/css" href="css/main.css"> \n    </head>\n    <body>\n        {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/if}} \n        {{#if content.content}}{{{content.content}}}{{/if}}\n    </body>\n</html>\n',
+        autoToc: '<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset="utf-8">\n        <title>{{content.fullTitle}}</title>\n        <link rel="stylesheet" type="text/css" href="css/main.css"> \n    </head>\n    <body>\n        {{#if content.renderTitle}}<h2>{{content.title}}</h2>{{/if}}\n        {{#if subSections}}\n        <ol>\n            {{#each subSections}}{{> sectionsNavTemplate}}{{/each}}\n        </ol>\n        {{/if}}\n    </body>\n</html>\n',
+        sectionsNavTemplate: '\n<li>\n    {{#if needPage}}\n    <a href="{{name}}.html">{{content.title}}</a>\n    {{/if}}\n    {{#if subSections}}\n    <ol>\n        {{#each subSections}}{{> sectionsNavTemplate}}{{/each}}\n    </ol>\n    {{/if}}\n</li>\n',
+        sectionsNCXTemplate: '\n<navPoint id="{{name}}">\n    <navLabel>\n        <text>{{content.title}}</text>\n    </navLabel>\n    {{#if needPage}}\n    <content src="{{name}}.html"/>\n    {{/if}}\n    {{#each subSections}} {{> sectionsNCXTemplate}} {{/each}}\n</navPoint>\n',
+        sectionsOPFManifestTemplate: '{{#if needPage}}\n<item id="{{name}}" href="{{name}}.html" media-type="application/xhtml+xml" />\n{{/if}}\n{{#each subSections}}{{> sectionsOPFManifestTemplate}}{{/each}}\n',
+        sectionsOPFSpineTemplate: '<itemref idref="{{name}}" />\n{{#each subSections}}{{> sectionsOPFSpineTemplate}}{{/each}}\n'
+    };
+
+    var Builder = function() {
+
+        this.make = function(epubConfig) {
+            console.debug('building epub', epubConfig);
+            var zip = new JSZip();
+
+            var deferred = D();
+            addAditionalInfo(epubConfig);
+            D.all(
+                addMimetype(zip),
+                addContainerInfo(zip, epubConfig),
+                addManifestOpf(zip, epubConfig),
+                addCover(zip, epubConfig),
+                addFiles(zip, epubConfig),
+                addEpub2Nav(zip, epubConfig),
+                addEpub3Nav(zip, epubConfig),
+                addStylesheets(zip, epubConfig),
+                addContent(zip, epubConfig)
+            ).then(function() {
+                deferred.resolve(zip);
+            }, function(err) { console.log(err); });
+
+            return deferred.promise;
+        };
+
+        function addInfoSection(section, titlePrefix, namePrefix) {
+            if(!section.content) {
+                section.content = {};
+            }
+            if(titlePrefix) {
+                titlePrefix = section.content.fullTitle = titlePrefix + ' - ' + section.content.title;
+                namePrefix = section.name = namePrefix + '-' + section.rank;
+            } else {
+                titlePrefix = section.content.fullTitle = section.content.title;
+                namePrefix = section.name = '' + section.rank;
+            }
+            if(section.content.content || section.content.renderTitle || section.epubType == 'auto-toc') {
+                section.needPage = true;
+            }
+            for(var i = 0; i < section.subSections.length; i++) {
+                section.subSections[i].rank = i;
+                addInfoSection(section.subSections[i], titlePrefix, namePrefix);
+            }
+        }
+
+        function addAditionalInfo(epubConfig) {
+            //Default options
+            epubConfig.options.tocName = epubConfig.options.tocName || 'Menu';
+            //Generate name and full title for each section/subsection
+            for(var i = 0; i < epubConfig.sections.length; i++) {
+                epubConfig.sections[i].rank = i;
+                addInfoSection(epubConfig.sections[i]);
+            }
+        }
+
+        function addMimetype(zip) {
+            zip.file('mimetype', templates.mimetype);
+        }
+
+        function addContainerInfo(zip, epubConfig) {
+            zip.folder('META-INF').file('container.xml', compile(templates.container, epubConfig));
+        }
+
+        function addManifestOpf(zip, epubConfig) {
+            Handlebars.registerPartial('sectionsOPFManifestTemplate', templates.sectionsOPFManifestTemplate);
+            Handlebars.registerPartial('sectionsOPFSpineTemplate', templates.sectionsOPFSpineTemplate);
+            zip.folder('EPUB').file('lightnovel.opf', compile(templates.opf, epubConfig));
+        }
+
+        function addCover(zip, epubConfig) {
+            var deferred = D();
+
+            if(epubConfig.coverUrl) {
+                JSZipUtils.getBinaryContent(epubConfig.coverUrl, function(err, data) {
+                    if(!err) {
+                        zip.folder('EPUB').folder('images').file(epubConfig.options.coverFilename, data, { binary: true });
+                        deferred.resolve('');
+                    } else {
+                        deferred.reject(err);
+                    }
+                });
+            } else {
+                deferred.resolve(true);
+            }
+            return deferred.promise;
+        }
+
+        function addEpub2Nav(zip, epubConfig) {
+            Handlebars.registerPartial('sectionsNCXTemplate', templates.sectionsNCXTemplate);
+            zip.folder('EPUB').file('lightnovel.ncx', compile(templates.ncx, epubConfig));
+        }
+
+        function addEpub3Nav(zip, epubConfig) {
+            Handlebars.registerPartial('sectionsNavTemplate', templates.sectionsNavTemplate);
+            zip.folder('EPUB').file('nav.html', compile(templates.nav, epubConfig));
+        }
+
+        function addStylesheets(zip, epubConfig) {
+            var deferred = D();
+            if(epubConfig.stylesheet.url) {
+                return ajax(epubConfig.stylesheet.url).then(function(result) {
+                    epubConfig.styles = result.data;
+                    compileAndAddCss();
+                });
+            } else {
+                compileAndAddCss();
+            }
+            return deferred.promise;
+
+            function compileAndAddCss() {
+                var styles = {
+                    original: epubConfig.stylesheet.replaceOriginal ? '' : templates.css,
+                    custom: epubConfig.styles
+                };
+                zip.folder('EPUB').folder('css').file('main.css', compile('{{{original}}}{{{custom}}}', styles, true));
+                deferred.resolve(true);
+            }
+        }
+
+        function addFiles(zip, epubConfig) {
+            var deferred_list = [];
+            for(var i = 0; i < epubConfig.additionalFiles.length; i++) {
+                var file = epubConfig.additionalFiles[i];
+                var deferred = new D();
+                JSZipUtils.getBinaryContent(file.url, (function(file, deferred) {
+                    return function(err, data) {
+                        if(!err) {
+                            zip.folder('EPUB').folder(file.folder).file(file.filename, data, { binary: true });
+                            deferred.resolve('');
+                        } else {
+                            deferred.reject(err);
+                        }
+                    };
+                })(file, deferred));
+                deferred_list.push(deferred.promise);
+            }
+            return D.all(deferred_list);
+        }
+
+        function addSection(zip, section) {
+            if(section.needPage) {
+                if(section.epubType == 'auto-toc') {
+                    zip.folder('EPUB').file(section.name + '.html', compile(templates.autoToc, section));
+                } else {
+                    zip.folder('EPUB').file(section.name + '.html', compile(templates.content, section));
+                }
+            }
+            for(var i = 0; i < section.subSections.length; i++) {
+                addSection(zip, section.subSections[i]);
+            }
+        }
+
+        function addContent(zip, epubConfig) {
+            for(var i = 0; i < epubConfig.sections.length; i++) {
+                addSection(zip, epubConfig.sections[i]);
+            }
+        }
+
+        function compile(template, content, skipFormatting) {
+            return formatHTML(Handlebars.compile(template)(content));
+
+            function formatHTML(htmlstr) {
+                /*jslint camelcase:false*/
+                return(skipFormatting || typeof html_beautify === 'undefined') ? htmlstr :
+                    html_beautify(htmlstr, {
+                        'end_with_newline': false,
+                        'indent_char': '\t',
+                        'indent_inner_html': true,
+                        'indent_size': '1',
+                        'preserve_newlines': false,
+                        'wrap_line_length': '0',
+                        'unformatted': [],
+                        'selector_separator_newline': false,
+                        'newline_between_rules': true
+                    });
+                /*jslint camelcase:true*/
+            }
+        }
+    };
+
+    // manage dependency exports
+    if(typeof module !== 'undefined') {
+        module.exports.builder = new Builder();
+    } else if(typeof exports !== 'undefined') {
+        exports.builder = new Builder();
+    } else if(typeof window === 'undefined') {
+        throw new Error('unable to expose module: no module, exports object and no global window detected');
+    }
+
+    if(typeof window !== 'undefined') {
+        window.epubMaker = new Builder();
+    }
+}());
+
+},{"../../js/util/ajax":7,"../../js/util/console":8,"d.js":3}],7:[function(require,module,exports){
 /* global module, ActiveXObject */
 (function() {
     'use strict';
@@ -1090,7 +1336,7 @@ process.umask = function() { return 0; };
     	return deferred.promise;
     };
 }());
-},{"../../js/util/console":7,"d.js":2}],7:[function(require,module,exports){
+},{"../../js/util/console":8,"d.js":3}],8:[function(require,module,exports){
 /* global module, console */
 (function() {
     'use strict';
@@ -1101,7 +1347,7 @@ process.umask = function() { return 0; };
     };
     function f() {} 
 }());
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /* global Handlebars */
 (function() {
     'use strict';
@@ -1127,7 +1373,7 @@ process.umask = function() { return 0; };
         return str.substr(str.lastIndexOf('.') + 1);
     }
 })();
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /* global module, s, console */
 (function() {
     'use strict';

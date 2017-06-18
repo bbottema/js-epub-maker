@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="uid" xml:lang="en-US" prefix="cc: http://creativecommons.org/ns#">
+    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <dc:identifier id="uid">{{uuid}}</dc:identifier>
+        <dc:title>{{title}}</dc:title>
+        <dc:creator>{{author}}</dc:creator>
+        <dc:language>{{lang}}</dc:language>
+        <dc:date>{{publicationDate}}</dc:date>
+        <meta property="dcterms:modified">{{modificationDate}}</meta>
+        {{#if rights}}
+            <!-- rights expressions for the work as a whole -->
+            {{#if rights.description}}<dc:rights>{{rights.description}}</dc:rights>{{/if}}
+            {{#if rights.license}}<link rel="cc:license" href="{{rights.license}}"/>{{/if}}
+            {{#if rights.attributionUrl}}<meta property="cc:attributionURL">{{attributionUrl}}</meta>{{/if}}
+        {{/if}}
+        {{#if coverUrl}}
+            {{#if coverRights}}
+                <!-- rights expression for the cover image -->       
+                {{#if coverRights.license}}<link rel="cc:license" refines="#cover" href="{{coverRights.license}}" />{{/if}}
+                {{#if coverRights.attributionUrl}}<link rel="cc:attributionURL" refines="#cover" href="{{coverRights.attributionUrl}}" />{{/if}}
+            {{/if}}
+                <!-- cover meta element included for 2.0 reading system compatibility: -->
+                <meta name="cover" content="cover"/>
+        {{/if}}
+    </metadata>
+    <manifest>
+        {{#each sections}}{{> sectionsOPFManifestTemplate}}{{/each}}
+        <item id="nav" href="nav.html" properties="nav" media-type="application/xhtml+xml" />
+        {{#each additionalFiles}}
+        <item id="{{filename}}" href="{{folder}}/{{filename}}" media-type="{{mimetype filename}}" />
+        {{/each}}
+        {{#if coverUrl}}
+        <item id="cover" href="images/{{options.coverFilename}}" media-type="{{mimetype options.coverFilename}}" properties="cover-image" />
+        {{/if}}
+        <item id="css" href="css/main.css" media-type="text/css" />
+        <!-- ncx included for 2.0 reading system compatibility: -->
+        <item id="ncx" href="lightnovel.ncx" media-type="application/x-dtbncx+xml" />
+    </manifest>
+    <spine toc="ncx">
+        <itemref idref="nav" />
+        {{#each sections}}{{> sectionsOPFSpineTemplate}}{{/each}}
+    </spine>
+    <guide>
+        <reference type="toc" href="nav.html"/>
+    </guide>
+</package>
