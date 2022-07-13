@@ -29,7 +29,7 @@ EpubMaker.Section = function(epubType, id, content, includeInToc, includeInLandm
 
 ## API example
 
-Taken from the included [test page](https://github.com/bbottema/js-epub-maker/blob/master/src/test/test-script.js), which is reproduced in [the online demo](https://jsfiddle.net/plantface/4z50uv7p/).
+Taken from the included [test page](https://github.com/bbottema/js-epub-maker/blob/master/src/test/test-script.js), which is reproduced in [the online demo](https://jsfiddle.net/plantface/tm37cj9p/).
 
 ```javascript
 new EpubMaker()
